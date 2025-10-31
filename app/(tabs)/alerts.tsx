@@ -1,10 +1,10 @@
 import { colors } from "@/styles";
 import { StyleSheet, Text, View } from "react-native";
 
-export default function Home() {
+export default function Alerts() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Home</Text>
+      <Text style={styles.text}>Alerts</Text>
     </View>
   );
 }

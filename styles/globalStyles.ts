@@ -2,8 +2,8 @@ import { StyleSheet } from "react-native";
 import {
   borderRadius,
   colors,
-  fonts,
   fontSize,
+  fonts,
   shadows,
   spacing,
 } from "./constants";
@@ -26,7 +26,6 @@ export const commonStyles = StyleSheet.create({
 
   containerLight: {
     flex: 1,
-    backgroundColor: colors.backgroundLight,
     padding: spacing.lg,
   },
 
@@ -36,7 +35,7 @@ export const commonStyles = StyleSheet.create({
     fontWeight: "bold",
     fontFamily: fonts.primaryBold,
     marginBottom: spacing.sm,
-    color: colors.text,
+    color: colors.textDark,
   },
 
   titleLarge: {
@@ -45,13 +44,12 @@ export const commonStyles = StyleSheet.create({
     fontFamily: fonts.primaryBold,
     marginBottom: spacing.sm,
     textAlign: "center",
-    color: colors.text,
+    color: colors.textDark,
   },
 
   subtitle: {
     fontSize: fontSize.medium,
     fontFamily: fonts.primary,
-    color: colors.secondary,
     marginBottom: spacing.xl,
     textAlign: "center",
   },
@@ -89,7 +87,7 @@ export const commonStyles = StyleSheet.create({
     fontSize: fontSize.medium,
     fontFamily: fonts.primaryMedium,
     fontWeight: "500",
-    color: colors.text,
+    color: colors.textDark,
   },
 
   optionContainer: {
@@ -141,7 +139,6 @@ export const pageStyles = {
   auth: StyleSheet.create({
     container: {
       ...commonStyles.containerCentered,
-      backgroundColor: colors.backgroundLight,
     },
     title: {
       ...commonStyles.title,

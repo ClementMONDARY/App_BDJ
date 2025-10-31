@@ -1,12 +1,15 @@
 // Couleurs de l'application
 export const colors = {
   primary: "#257A83",
-  secondary: "#666",
-  background: "#fff",
+  primaryDark: "#1A555B",
+  iconActive: "#FFFFFF",
+  iconInactive: "#929292",
+  black: "#1E1E1E",
+  white: "#FFF",
   backgroundLight: "#f5f5f5",
-  text: "#000",
-  textLight: "#666",
-  white: "#fff",
+  background: "#25292e",
+  textDark: "#000",
+  textLight: "#FFF",
   shadow: "#000",
 };
 
@@ -55,7 +58,6 @@ export const borderRadius = {
 // Ombres
 export const shadows = {
   light: {
-    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 1,
@@ -65,7 +67,6 @@ export const shadows = {
     elevation: 2,
   },
   medium: {
-    shadowColor: colors.shadow,
     shadowOffset: {
       width: 0,
       height: 2,
