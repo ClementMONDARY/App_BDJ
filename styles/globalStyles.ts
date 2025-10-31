@@ -19,7 +19,6 @@ export const commonStyles = StyleSheet.create({
 
   containerCentered: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
     backgroundColor: colors.background,
     padding: spacing.lg,

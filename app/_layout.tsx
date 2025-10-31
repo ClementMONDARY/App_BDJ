@@ -6,25 +6,16 @@ export default function RootLayout() {
     <>
       <StatusBar style="auto" />
       <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{headerShown: false }}
-          />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="index"
-          options={{ 
+          options={{
             title: "Accueil",
             headerLeft: () => null,
           }}
-          />
-        <Stack.Screen
-          name="about"
-          options={{ title: "À propos" }}
-          />
-        <Stack.Screen
-          name="+not-found"
-          options={{ headerShown: false }}
-          />
+        />
+        <Stack.Screen name="about" options={{ title: "À propos" }} />
+        <Stack.Screen name="+not-found" options={{ headerShown: false }} />
       </Stack>
     </>
   );
