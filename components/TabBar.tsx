@@ -12,8 +12,8 @@ import { TabBarButton } from "./TabBarButton";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const [dimensions, setDimensions] = useState({ width: 100, height: 20 });
-  const TAB_BAR_PADDING = 20; // padding horizontal de la tabbar
-  const BUTTON_MARGIN = 12; // marge de l'animated view
+  const TAB_BAR_PADDING = 20;
+  const BUTTON_MARGIN = 12;
 
   const buttonWidth =
     (dimensions.width - TAB_BAR_PADDING * 2) / state.routes.length;
@@ -134,11 +134,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     paddingBottom: 50,
-    overflow: "hidden",
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
     backgroundColor: "transparent",
-    borderRadius: 10,
   },
 });
