@@ -40,7 +40,7 @@ function AnimatedTabIcon({
 
 export default function TabsLayout() {
   return (
-    <Tabs tabBar={props => <TabBar {...props} />}>
+    <Tabs tabBar={(props) => <TabBar {...props} />}>
       <Tabs.Screen name="index" options={{ title: "Home" }} />
       <Tabs.Screen name="forum" options={{ title: "Forum" }} />
       <Tabs.Screen name="events" options={{ title: "Events" }} />
