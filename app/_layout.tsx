@@ -1,5 +1,4 @@
-import Header from "@/components/Header";
-
+import { AuthProvider } from "@/contexts/AuthContext";
 import {
   RobotoMono_400Regular,
   RobotoMono_500Medium,
@@ -39,22 +38,13 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          header: (props) => <Header {...props} />,
-        }}
-      >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="index"
-          options={{
-            title: "Accueil",
-          }}
-        />
-        <Stack.Screen name="about" options={{ title: "À propos" }} />
-        <Stack.Screen name="+not-found" options={{ headerShown: false }} />
-      </Stack>
+      <AuthProvider>
+        <StatusBar style="auto" />
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" options={{ headerShown: false }} />
+        </Stack>
+      </AuthProvider>
     </GestureHandlerRootView>
   );
 }
