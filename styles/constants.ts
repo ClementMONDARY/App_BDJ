@@ -27,11 +27,11 @@ export const spacing = {
 
 // Polices
 export const fonts = {
-  // Utilisation temporaire de monospace en attendant l'installation des polices custom
-  primary: "monospace",
-  primaryBold: "monospace",
-  primaryMedium: "monospace",
-  // Les vraies polices Roboto Mono (à activer après installation)
+  // définir la police par défaut sur Roboto Mono (clés chargées via useFonts)
+  primary: "RobotoMono_400Regular",
+  primaryBold: "RobotoMono_700Bold",
+  primaryMedium: "RobotoMono_500Medium",
+  // Les vraies polices Roboto Mono (noms répertoriés pour référence)
   roboto: {
     primary: "RobotoMono_400Regular",
     primaryBold: "RobotoMono_700Bold",

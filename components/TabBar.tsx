@@ -4,9 +4,9 @@ import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useState } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import Animated, {
-    useAnimatedStyle,
-    useSharedValue,
-    withSpring,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from "react-native-reanimated";
 import { TabBarButton } from "./TabBarButton";
 
