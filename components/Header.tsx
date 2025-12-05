@@ -58,19 +58,23 @@ export default function Header(props: any) {
       {/* Right: Account and Settings Buttons */}
       <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
         {/* Account Button */}
-        <Pressable
-          onPress={() => {
-            console.log("Account pressed");
-          }}
-          style={({ pressed }) => ({
-            opacity: pressed ? 0.7 : 1,
-          })}
-        >
-          <Image
-            source={{ uri: "https://avatar.iran.liara.run/public" }}
-            style={{ width: 45, height: 45, borderRadius: 20 }}
-          />
-        </Pressable>
+        {/* <Link href="/signup" asChild>
+              <Pressable style={styles.button}>
+                <Text style={styles.buttonText}>S'inscrire</Text>
+              </Pressable>
+            </Link> */}
+        <Link href="/login" asChild>
+          <Pressable
+            style={({ pressed }) => ({
+              opacity: pressed ? 0.7 : 1,
+            })}
+          >
+            <Image
+              source={{ uri: "https://avatar.iran.liara.run/public" }}
+              style={{ width: 45, height: 45, borderRadius: 20 }}
+            />
+          </Pressable>
+        </Link>
 
         {/* Settings Button */}
         <Link

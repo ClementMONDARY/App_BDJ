@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import { AuthProvider } from "@/contexts/AuthContext";
 import {
   RobotoMono_400Regular,
@@ -41,10 +42,14 @@ export default function RootLayout() {
       <AuthProvider>
         <StatusBar style="auto" />
         <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(tabs)"
+            options={{ headerShown: false, header: (props) => <Header {...props} /> }}
+          />
           <Stack.Screen name="+not-found" options={{ headerShown: false }} />
         </Stack>
       </AuthProvider>
     </GestureHandlerRootView>
   );
 }
+

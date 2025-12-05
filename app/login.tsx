@@ -44,7 +44,7 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: colors.black }}
+      style={{ flex: 1, backgroundColor: colors.backgroundLight }}
     >
       <View
         style={[
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: colors.white,
+    color: colors.textDark,
     marginBottom: 40,
     textAlign: "center",
   },
@@ -129,28 +129,28 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    color: colors.white,
+    color: colors.textDark,
     fontSize: 16,
     fontWeight: "500",
   },
   input: {
-    backgroundColor: "#1A1A1A",
+    backgroundColor: colors.backgroundLight,
     borderRadius: 12,
     padding: 16,
-    color: colors.white,
+    color: colors.textDark,
     fontSize: 16,
     borderWidth: 1,
     borderColor: "#333",
   },
   button: {
-    backgroundColor: colors.white,
+    backgroundColor: colors.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: colors.black,
+    color: colors.textLight,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   link: {
-    color: colors.white,
+    color: colors.textDark,
     fontSize: 14,
     fontWeight: "bold",
     textDecorationLine: "underline",
