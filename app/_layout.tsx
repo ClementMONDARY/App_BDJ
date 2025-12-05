@@ -41,10 +41,16 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <StatusBar style="auto" />
-        <Stack>
+        <Stack
+          screenOptions={{
+            header: (props) => <Header {...props} />,
+          }}
+        >
           <Stack.Screen
             name="(tabs)"
-            options={{ headerShown: false, header: (props) => <Header {...props} /> }}
+            options={{
+              headerShown: false, // This will hide the custom header for tabs, if you want it, remove this line.
+            }}
           />
           <Stack.Screen name="+not-found" options={{ headerShown: false }} />
         </Stack>
@@ -52,4 +58,3 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
-

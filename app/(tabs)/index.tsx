@@ -1,7 +1,6 @@
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
-import { Link } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
@@ -20,7 +19,9 @@ export default function HomeScreen() {
               <Text style={styles.buttonText}>Se déconnecter</Text>
             </Pressable>
           </>
-        ) : null}
+        ) : (
+          <Text style={styles.userInfo}>Non connecté</Text>
+        )}
       </View>
     </View>
   );
@@ -36,19 +37,15 @@ const styles = StyleSheet.create({
   text: {
     color: colors.textDark,
     fontSize: 24,
-    marginBottom: 20,
   },
   authContainer: {
     marginTop: 20,
     alignItems: "center",
     gap: 10,
-    padding: 20,
-    borderRadius: 10,
     width: "80%",
   },
   userInfo: {
     color: colors.textDark,
-    marginBottom: 10,
     textAlign: "center",
   },
   button: {
