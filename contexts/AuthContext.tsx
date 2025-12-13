@@ -39,7 +39,7 @@ export function useAuth() {
   return context;
 }
 
-const API_URL = "http://172.17.250.119:3000";
+const API_URL = "https://dayle-wieldier-shemeka.ngrok-free.dev";
 
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
