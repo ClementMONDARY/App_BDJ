@@ -13,7 +13,6 @@ import { Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
-  // charger les fontes roboto mono
   const [fontsLoaded] = useFonts({
     RobotoMono_400Regular,
     RobotoMono_500Medium,
@@ -33,7 +32,6 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    // simple fallback pendant le chargement des polices
     return null;
   }
 
@@ -49,7 +47,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="(tabs)"
             options={{
-              headerShown: false, // This will hide the custom header for tabs, if you want it, remove this line.
+              headerShown: false,
             }}
           />
           <Stack.Screen name="+not-found" options={{ headerShown: false }} />

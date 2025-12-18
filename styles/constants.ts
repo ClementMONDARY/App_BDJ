@@ -10,6 +10,7 @@ export const colors = {
   background: "#25292e",
   textDark: "#000",
   textLight: "#FFF",
+  inputBorder: "#DDDDDD",
   shadow: "#000",
 };
 
@@ -41,6 +42,7 @@ export const fonts = {
 
 // Tailles de police
 export const fontSize = {
+  xs: 12,
   small: 14,
   medium: 16,
   large: 18,
