@@ -20,20 +20,19 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 6,
     gap: 6,
-    marginBottom: spacing.xxl, // Gap of 40px from design (gap-10 in flex-col container, so margin bottom helps)
-    // Actually the parent container has gap-10 (40px). So this component shouldn't strictly enforce margin if the parent handles gap.
-    // Design: "flex flex-col ... gap-10". So I will NOT add large margin bottom here, let the parent handle it.
+    marginBottom: spacing.xxl,
   },
   question: {
     color: colors.black,
-    fontSize: fontSize.medium, // text-base
-    fontFamily: fonts.primaryBold, // font-bold
+    fontSize: fontSize.medium,
+    fontFamily: fonts.primaryBold,
     textAlign: "left",
   },
   answer: {
     color: colors.black,
-    fontSize: fontSize.xs, // text-xs
-    fontFamily: fonts.primary, // font-light (using primary regular as closest, or specific light font if available)
-    lineHeight: 18, // for readability
+    fontSize: fontSize.xs,
+    fontFamily: fonts.primary,
+    lineHeight: 18,
+    paddingHorizontal: spacing.md,
   },
 });

@@ -1,15 +1,10 @@
 import { HelpCenterAPI, type Question } from "@/api/helpCenter";
+import { ThemedButton } from "@/components/buttons/ThemedButton";
+import { ThemedTextInput } from "@/components/inputs/ThemedTextInput";
 import { QAItem } from "@/components/QAItem";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
-import {
-  borderRadius,
-  colors,
-  fontSize,
-  fonts,
-  shadows,
-  spacing,
-} from "@/styles";
+import { colors, fontSize, fonts, spacing } from "@/styles";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -18,10 +13,8 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -38,7 +31,6 @@ export default function HelpCenter() {
   const [newQuestion, setNewQuestion] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  // Filter questions when search query changes
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredQuestions(questions);
@@ -80,7 +72,7 @@ export default function HelpCenter() {
 
       Alert.alert("Succès", "Votre question a été envoyée !");
       setNewQuestion("");
-      refetch(); // Refetch questions to show the new one if it's approved/visible immediately
+      refetch();
     } catch (error: any) {
       Alert.alert("Erreur", error.message || "Une erreur est survenue.");
       console.error(error);
@@ -91,56 +83,33 @@ export default function HelpCenter() {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher des mots clés"
-          placeholderTextColor={colors.iconInactive}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
+      <ThemedTextInput
+        placeholder="Rechercher des mots clés"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
     </View>
   );
 
   const renderForm = () => (
     <View style={styles.formContainer}>
       <Text style={styles.formTitle}>
-        Une Question ? C’est ici que ça se passe ↓
+        Une question ? C’est ici que ça se passe ↓
       </Text>
 
-      {/* Question Input */}
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={[styles.textInput, styles.textArea]}
-          placeholder="Votre question..."
-          placeholderTextColor={colors.iconInactive}
-          multiline
-          textAlignVertical="top"
-          value={newQuestion}
-          onChangeText={setNewQuestion}
-        />
-      </View>
+      <ThemedTextInput
+        placeholder="Votre question..."
+        multiline
+        value={newQuestion}
+        onChangeText={setNewQuestion}
+        containerStyle={{ marginBottom: 10 }}
+      />
 
-      {/* Submit Button */}
-      <Pressable
-        style={({ pressed }) => [
-          styles.submitButton,
-          { opacity: pressed || submitting ? 0.7 : 1 },
-        ]}
+      <ThemedButton
+        title="Soumettre"
         onPress={handleSubmit}
-        disabled={submitting}
-      >
-        {submitting ? (
-          <ActivityIndicator color={colors.white} />
-        ) : (
-          <Text style={styles.submitButtonText}>Soumettre</Text>
-        )}
-      </Pressable>
-
-      {/* Spacer for bottom inset */}
-      <View style={{ height: 20 }} />
+        loading={submitting}
+      />
     </View>
   );
 
@@ -175,6 +144,7 @@ export default function HelpCenter() {
             )
           }
         />
+        <View style={{ height: 20 }} />
       </KeyboardAvoidingView>
     </>
   );
@@ -187,20 +157,6 @@ const styles = StyleSheet.create({
   headerContainer: {
     marginBottom: spacing.xxl,
   },
-  searchContainer: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.medium,
-    ...shadows.light,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    overflow: "hidden",
-  },
-  searchInput: {
-    padding: 12,
-    fontFamily: fonts.primary,
-    fontSize: fontSize.xs,
-    color: colors.black,
-  },
   emptyText: {
     textAlign: "center",
     color: colors.iconInactive,
@@ -208,7 +164,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 40,
   },
-  // Form Styles
   formContainer: {
     marginTop: spacing.md,
     backgroundColor: colors.backgroundLight,
@@ -219,36 +174,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.primaryBold,
     color: colors.black,
     marginBottom: 5,
-  },
-  inputWrapper: {
-    backgroundColor: colors.white,
-    borderRadius: borderRadius.medium,
-    ...shadows.light,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    marginBottom: 10,
-  },
-  textInput: {
-    padding: 12,
-    fontFamily: fonts.primary,
-    fontSize: fontSize.xs,
-    color: colors.black,
-  },
-  textArea: {
-    height: 112,
-    textAlignVertical: "top",
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    ...shadows.light,
-  },
-  submitButtonText: {
-    color: colors.white,
-    fontSize: fontSize.medium,
-    fontWeight: "600",
   },
 });

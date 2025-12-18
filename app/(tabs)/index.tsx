@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { ThemedButton } from "@/components/buttons/ThemedButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
@@ -15,9 +16,7 @@ export default function HomeScreen() {
             <Text style={styles.userInfo}>
               Connecté en tant que: {user.email}
             </Text>
-            <Pressable onPress={signOut} style={styles.button}>
-              <Text style={styles.buttonText}>Se déconnecter</Text>
-            </Pressable>
+            <ThemedButton title="Se déconnecter" onPress={signOut} />
           </>
         ) : (
           <Text style={styles.userInfo}>Non connecté</Text>

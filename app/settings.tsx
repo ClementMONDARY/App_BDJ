@@ -22,12 +22,6 @@ export default function Settings() {
         <TouchableOpacity style={pageStyles.settings.option}>
           <Text style={pageStyles.settings.optionText}>À propos</Text>
         </TouchableOpacity>
-
-        <Link href="/help-center" asChild>
-          <TouchableOpacity style={pageStyles.settings.option}>
-            <Text style={pageStyles.settings.optionText}>Aide</Text>
-          </TouchableOpacity>
-        </Link>
       </View>
 
       <Link href="/" asChild>
