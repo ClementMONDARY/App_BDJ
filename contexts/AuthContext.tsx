@@ -27,6 +27,10 @@ interface AuthContextType {
   ) => Promise<void>;
   signOut: () => Promise<void>;
   getToken: () => Promise<string | null>;
+  signInWithTokens: (
+    accessToken: string,
+    refreshToken: string,
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -237,6 +241,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [checkUser],
   );
 
+  const signInWithTokens = useCallback(
+    async (accessToken: string, refreshToken: string) => {
+      try {
+        await saveTokens(accessToken, refreshToken);
+        await checkUser();
+      } catch (error) {
+        console.error("Sign in with tokens error:", error);
+        throw error;
+      }
+    },
+    [checkUser],
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -246,6 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         getToken: getAccessToken,
+        signInWithTokens,
       }}
     >
       {children}

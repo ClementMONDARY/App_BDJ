@@ -33,7 +33,6 @@ export default function RootLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
-    // simple fallback pendant le chargement des polices
     return null;
   }
 
@@ -49,7 +48,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="(tabs)"
             options={{
-              headerShown: false, // This will hide the custom header for tabs, if you want it, remove this line.
+              headerShown: false,
             }}
           />
           <Stack.Screen name="+not-found" options={{ headerShown: false }} />

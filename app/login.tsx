@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useMicrosoftAuth } from "@/hooks/useMicrosoftAuth";
 import { colors } from "@/styles";
+import { FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -22,6 +24,7 @@ export default function Login() {
   const { signIn } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { request, promptAsync } = useMicrosoftAuth();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -95,6 +98,26 @@ export default function Login() {
             )}
           </Pressable>
 
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OU</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.socialButton,
+              { opacity: pressed || !request ? 0.7 : 1 },
+            ]}
+            onPress={() => promptAsync()}
+            disabled={!request}
+          >
+            <FontAwesome name="microsoft" size={20} color={colors.textLight} />
+            <Text style={styles.socialButtonText}>
+              Continuer avec Microsoft
+            </Text>
+          </Pressable>
+
           <View style={styles.footer}>
             <Text style={styles.footerText}>Pas encore de compte ? </Text>
             <Link href="/signup" asChild>
@@ -153,6 +176,37 @@ const styles = StyleSheet.create({
     color: colors.textLight,
     fontSize: 16,
     fontWeight: "bold",
+  },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#444",
+  },
+  dividerText: {
+    color: colors.iconInactive,
+    paddingHorizontal: 10,
+    fontSize: 14,
+  },
+  socialButton: {
+    backgroundColor: "#2F2F2F", // Dark grey/black for Microsoft
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    borderWidth: 1,
+    borderColor: "#444",
+  },
+  socialButtonText: {
+    color: colors.textLight,
+    fontSize: 16,
+    fontWeight: "500",
   },
   footer: {
     flexDirection: "row",
