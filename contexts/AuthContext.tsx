@@ -1,3 +1,4 @@
+import { CONFIG } from "@/constants/Config";
 import * as SecureStore from "expo-secure-store";
 import type React from "react";
 import {
@@ -39,8 +40,6 @@ export function useAuth() {
   return context;
 }
 
-const API_URL = "http://172.17.250.119:3000";
-
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 
@@ -70,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     try {
       const refreshToken = await getRefreshToken();
-      await fetch(`${API_URL}/auth/logout`, {
+      await fetch(`${CONFIG.API_URL}/auth/logout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),
@@ -88,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const refreshToken = await getRefreshToken();
       if (!refreshToken) return null;
 
-      const response = await fetch(`${API_URL}/auth/refresh`, {
+      const response = await fetch(`${CONFIG.API_URL}/auth/refresh`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,7 +144,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const response = await authenticatedFetch(`${API_URL}/auth/me`);
+      const response = await authenticatedFetch(`${CONFIG.API_URL}/auth/me`);
 
       if (response.ok) {
         const userData = await response.json();
@@ -171,7 +170,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = useCallback(
     async (email: string, password: string) => {
       try {
-        const response = await fetch(`${API_URL}/auth/login`, {
+        const response = await fetch(`${CONFIG.API_URL}/auth/login`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -205,7 +204,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       lastname: string,
     ) => {
       try {
-        const response = await fetch(`${API_URL}/auth/signup`, {
+        const response = await fetch(`${CONFIG.API_URL}/auth/signup`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
