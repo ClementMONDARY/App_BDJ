@@ -22,6 +22,12 @@ export default function Settings() {
         <TouchableOpacity style={pageStyles.settings.option}>
           <Text style={pageStyles.settings.optionText}>À propos</Text>
         </TouchableOpacity>
+
+        <Link href="/suggestion-box" asChild>
+          <TouchableOpacity style={pageStyles.settings.option}>
+            <Text style={pageStyles.settings.optionText}>Boîte de suggestion</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
 
       <Link href="/" asChild>

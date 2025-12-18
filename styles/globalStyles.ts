@@ -10,6 +10,16 @@ import {
 
 // Styles communs pour tous les composants
 export const commonStyles = StyleSheet.create({
+  mainContentContainer: {
+    width: "100%",
+    height: "100%",
+    padding: spacing.md,
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    display: "flex",
+    flex: 1,
+  },
   // Conteneurs
   container: {
     flex: 1,

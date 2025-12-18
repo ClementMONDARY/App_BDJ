@@ -1,9 +1,9 @@
-import { HelpCenterAPI, type Question } from "@/api/helpCenter";
+import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
-import { QAItem } from "@/components/help-center/QAItem";
+import { SuggestionItem } from "@/components/suggestion-box/SuggestionItem";
 import { useAuth } from "@/contexts/AuthContext";
-import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
+import { useSuggestions } from "@/hooks/useSuggestions";
 import { colors, fontSize, fonts, spacing } from "@/styles";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -19,37 +19,41 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export default function HelpCenter() {
+export default function SuggestionBox() {
   const { user, getToken } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
   const [searchQuery, setSearchQuery] = useState("");
-  const { questions, loading, refetch } = useHelpCenterQuestions();
-  const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
+  const { suggestions, loading, refetch } = useSuggestions();
+  const [filteredSuggestions, setFilteredSuggestions] = useState<Suggestion[]>(
+    [],
+  );
 
-  const [newQuestion, setNewQuestion] = useState("");
+  // Form State
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setFilteredQuestions(questions);
+      setFilteredSuggestions(suggestions);
     } else {
       const lowerQuery = searchQuery.toLowerCase();
-      const filtered = questions.filter(
-        (q) =>
-          q.message.toLowerCase().includes(lowerQuery) ||
-          q.answer.toLowerCase().includes(lowerQuery),
+      const filtered = suggestions.filter(
+        (s) =>
+          s.title.toLowerCase().includes(lowerQuery) ||
+          s.content.toLowerCase().includes(lowerQuery),
       );
-      setFilteredQuestions(filtered);
+      setFilteredSuggestions(filtered);
     }
-  }, [searchQuery, questions]);
+  }, [searchQuery, suggestions]);
 
   const handleSubmit = async () => {
     if (!user) {
       Alert.alert(
         "Connexion requise",
-        "Vous devez être connecté pour poser une question.",
+        "Vous devez être connecté pour soumettre une idée.",
         [
           { text: "Annuler", style: "cancel" },
           { text: "Se connecter", onPress: () => router.push("/login") },
@@ -58,24 +62,27 @@ export default function HelpCenter() {
       return;
     }
 
-    if (!newQuestion.trim()) {
-      Alert.alert("Erreur", "Veuillez entrer une question.");
+    if (!newTitle.trim() || !newContent.trim()) {
+      Alert.alert("Erreur", "Veuillez remplir le titre et le contenu.");
       return;
     }
 
     try {
       setSubmitting(true);
       const token = await getToken();
-      if (!token) throw new Error("Impossible de récupérer le token");
+      if (!token) throw new Error("Token manquant");
 
-      await HelpCenterAPI.submitQuestion(newQuestion, token);
+      await SuggestionsAPI.submitSuggestion(newTitle, newContent, token);
 
-      Alert.alert("Succès", "Votre question a été envoyée !");
-      setNewQuestion("");
+      Alert.alert("Succès", "Votre suggestion a été envoyée !");
+      setNewTitle("");
+      setNewContent("");
       refetch();
     } catch (error: any) {
-      Alert.alert("Erreur", error.message || "Une erreur est survenue.");
-      console.error(error);
+      Alert.alert(
+        "Erreur",
+        error.message || "Impossible d'envoyer la suggestion",
+      );
     } finally {
       setSubmitting(false);
     }
@@ -94,19 +101,26 @@ export default function HelpCenter() {
   const renderForm = () => (
     <View style={styles.formContainer}>
       <Text style={styles.formTitle}>
-        Une question ? C’est ici que ça se passe ↓
+        Tu as une idée en tête qui pourrait plaire ? On t’écoute ↓
       </Text>
 
       <ThemedTextInput
-        placeholder="Votre question..."
+        placeholder="Titre"
+        value={newTitle}
+        onChangeText={setNewTitle}
+        containerStyle={{ marginBottom: 10 }}
+      />
+
+      <ThemedTextInput
+        placeholder="Contenu"
         multiline
-        value={newQuestion}
-        onChangeText={setNewQuestion}
+        value={newContent}
+        onChangeText={setNewContent}
         containerStyle={{ marginBottom: 10 }}
       />
 
       <ThemedButton
-        title="Soumettre"
+        title="Send Request"
         onPress={handleSubmit}
         loading={submitting}
       />
@@ -115,17 +129,17 @@ export default function HelpCenter() {
 
   return (
     <>
-      <Stack.Screen options={{ title: "Centre d'aide" }} />
+      <Stack.Screen options={{ title: "Boîte à idées" }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={{ flex: 1, backgroundColor: colors.backgroundLight }}
         keyboardVerticalOffset={100}
       >
         <FlatList
-          data={filteredQuestions}
-          keyExtractor={(_, index) => index.toString()}
+          data={filteredSuggestions}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <QAItem question={item.message} answer={item.answer} />
+            <SuggestionItem suggestion={item} onVote={refetch} />
           )}
           contentContainerStyle={[
             styles.listContent,
@@ -135,7 +149,9 @@ export default function HelpCenter() {
           ListFooterComponent={renderForm()}
           ListEmptyComponent={
             !loading ? (
-              <Text style={styles.emptyText}>Aucune question trouvée.</Text>
+              <Text style={styles.emptyText}>
+                Aucune suggestion pour le moment.
+              </Text>
             ) : (
               <ActivityIndicator
                 color={colors.primary}
@@ -166,8 +182,9 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginTop: spacing.md,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.backgroundLight, // or transparent to show background
     gap: 10,
+    paddingTop: 10,
   },
   formTitle: {
     fontSize: fontSize.medium,

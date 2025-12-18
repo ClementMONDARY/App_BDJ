@@ -21,6 +21,8 @@ This document serves as the single source of truth for the **App BDJ** project. 
   └── [route].tsx   # Screens/Pages
 /api                # API interactions and fetch calls
 /components         # Reusable UI components
+  ├── buttons       # Reusable buttons
+  └── inputs        # Reusable inputs
 /constants          # App-wide constants (Config, Strings)
 /contexts           # React Contexts (Auth, Theme, etc.)
 /hooks              # Custom React Hooks
@@ -95,6 +97,7 @@ const styles = StyleSheet.create({
 - [ ] Export a default component.
 - [ ] Use `Screen` components/options for header configuration if needed.
 - [ ] Import `Screen` wrapper or `Layout` if applicable.
+- [ ] Apply `commonStyles.mainContentContainer` to the main content container.
 
 ### 📦 Component Creation Checklist
 - [ ] Is it generic? -> Put in `/components`.
