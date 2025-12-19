@@ -106,7 +106,7 @@ export default function HelpCenter() {
       />
 
       <ThemedButton
-        title="Soumettre"
+        title="Envoyer"
         onPress={handleSubmit}
         loading={submitting}
       />

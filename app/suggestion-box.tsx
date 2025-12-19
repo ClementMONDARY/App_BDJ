@@ -105,14 +105,14 @@ export default function SuggestionBox() {
       </Text>
 
       <ThemedTextInput
-        placeholder="Titre"
+        placeholder="Titre..."
         value={newTitle}
         onChangeText={setNewTitle}
         containerStyle={{ marginBottom: 10 }}
       />
 
       <ThemedTextInput
-        placeholder="Contenu"
+        placeholder="Contenu..."
         multiline
         value={newContent}
         onChangeText={setNewContent}
@@ -120,7 +120,7 @@ export default function SuggestionBox() {
       />
 
       <ThemedButton
-        title="Send Request"
+        title="Envoyer"
         onPress={handleSubmit}
         loading={submitting}
       />
@@ -169,9 +169,6 @@ export default function SuggestionBox() {
 const styles = StyleSheet.create({
   listContent: {
     padding: spacing.paddingMain,
-  },
-  headerContainer: {
-    marginBottom: spacing.xxl,
   },
   emptyText: {
     textAlign: "center",
