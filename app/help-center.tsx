@@ -89,7 +89,10 @@ export default function HelpCenter() {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
-      <UnderlinedTitle title="FOIRE AUX QUESTIONS" style={{ marginBottom: 20 }} />
+      <UnderlinedTitle
+        title="FOIRE AUX QUESTIONS"
+        style={{ marginBottom: 20 }}
+      />
     </View>
   );
 

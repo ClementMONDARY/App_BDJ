@@ -96,7 +96,10 @@ export default function SuggestionBox() {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
-      <UnderlinedTitle title="IDÉES DE LA COMMUNAUTÉ" style={{ marginBottom: 20 }} />
+      <UnderlinedTitle
+        title="IDÉES DE LA COMMUNAUTÉ"
+        style={{ marginBottom: 20 }}
+      />
     </View>
   );
 
