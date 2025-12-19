@@ -1,13 +1,14 @@
-import { ThemedButton } from "@/components/buttons/ThemedButton";
+import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
+import { commonStyles } from "@/styles/globalStyles";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
 
   return (
-    <View style={styles.container}>
+    <View style={commonStyles.mainContentContainer}>
       <Text style={styles.text}>Home</Text>
 
       <View style={styles.authContainer}>

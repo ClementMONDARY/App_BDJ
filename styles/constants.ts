@@ -12,6 +12,8 @@ export const colors = {
   textLight: "#FFF",
   inputBorder: "#DDDDDD",
   shadow: "#000",
+  error: "#CD0000",
+  underline: "#D9D9D9",
 };
 
 // Espacements

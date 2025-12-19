@@ -35,6 +35,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.inputBorder,
     overflow: "hidden",
+    width: "100%",
   },
   input: {
     padding: 12,
