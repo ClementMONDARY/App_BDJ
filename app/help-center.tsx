@@ -1,6 +1,7 @@
 import { HelpCenterAPI, type Question } from "@/api/helpCenter";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
+import { UnderlinedTitle } from "@/components/global/text/UnderlinedTitle";
 import { QAItem } from "@/components/help-center/QAItem";
 import { useAuth } from "@/contexts/AuthContext";
 import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
@@ -88,21 +89,19 @@ export default function HelpCenter() {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+      <UnderlinedTitle title="FOIRE AUX QUESTIONS" style={{ marginBottom: 20 }} />
     </View>
   );
 
   const renderForm = () => (
     <View style={styles.formContainer}>
-      <Text style={styles.formTitle}>
-        Une question ? C’est ici que ça se passe ↓
-      </Text>
+      <UnderlinedTitle title="UNE QUESTION ?" />
 
       <ThemedTextInput
         placeholder="Votre question..."
         multiline
         value={newQuestion}
         onChangeText={setNewQuestion}
-        containerStyle={{ marginBottom: 10 }}
       />
 
       <ThemedButton
@@ -118,7 +117,7 @@ export default function HelpCenter() {
       <Stack.Screen options={{ title: "Centre d'aide" }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, backgroundColor: colors.backgroundLight }}
+        style={{ flex: 1 }}
         keyboardVerticalOffset={100}
       >
         <FlatList
@@ -155,7 +154,8 @@ const styles = StyleSheet.create({
     padding: spacing.paddingMain,
   },
   headerContainer: {
-    marginBottom: spacing.xxl,
+    marginBottom: 0,
+    gap: 30,
   },
   emptyText: {
     textAlign: "center",
@@ -167,12 +167,12 @@ const styles = StyleSheet.create({
   formContainer: {
     marginTop: spacing.md,
     backgroundColor: colors.backgroundLight,
-    gap: 10,
+    gap: 20,
   },
   formTitle: {
     fontSize: fontSize.medium,
     fontFamily: fonts.primaryBold,
     color: colors.black,
-    marginBottom: 5,
+    marginBottom: 20,
   },
 });

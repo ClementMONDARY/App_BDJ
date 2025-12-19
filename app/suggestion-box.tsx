@@ -1,6 +1,7 @@
 import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
+import { UnderlinedTitle } from "@/components/global/text/UnderlinedTitle";
 import { SuggestionItem } from "@/components/suggestion-box/SuggestionItem";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSuggestions } from "@/hooks/useSuggestions";
@@ -95,28 +96,25 @@ export default function SuggestionBox() {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+      <UnderlinedTitle title="IDÉES DE LA COMMUNAUTÉ" style={{ marginBottom: 20 }} />
     </View>
   );
 
   const renderForm = () => (
     <View style={styles.formContainer}>
-      <Text style={styles.formTitle}>
-        Tu as une idée en tête qui pourrait plaire ? On t’écoute ↓
-      </Text>
+      <UnderlinedTitle title="UNE IDÉE EN TETE ?" />
 
       <ThemedTextInput
-        placeholder="Titre..."
+        placeholder="Votre titre..."
         value={newTitle}
         onChangeText={setNewTitle}
-        containerStyle={{ marginBottom: 10 }}
       />
 
       <ThemedTextInput
-        placeholder="Contenu..."
+        placeholder="Votre contenu..."
         multiline
         value={newContent}
         onChangeText={setNewContent}
-        containerStyle={{ marginBottom: 10 }}
       />
 
       <ThemedButton
@@ -167,6 +165,10 @@ export default function SuggestionBox() {
 }
 
 const styles = StyleSheet.create({
+  headerContainer: {
+    marginBottom: 0,
+    gap: 30,
+  },
   listContent: {
     padding: spacing.paddingMain,
   },
@@ -179,8 +181,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginTop: spacing.md,
-    backgroundColor: colors.backgroundLight, // or transparent to show background
-    gap: 10,
+    gap: 20,
     paddingTop: 10,
   },
   formTitle: {

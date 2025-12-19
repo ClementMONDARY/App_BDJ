@@ -1,6 +1,9 @@
+import { UsersAPI } from "@/api/users";
+import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,6 +11,18 @@ export default function Header(props: any) {
   const { navigation, route, options, back } = props;
   const title = options?.title ?? (route?.name ? String(route.name) : "Titre");
   const insets = useSafeAreaInsets();
+  const { user } = useAuth();
+  const [avatar, setAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      UsersAPI.getUserPublicInfo(user.id.toString())
+        .then((info) => setAvatar(info.avatar))
+        .catch(() => {});
+    } else {
+      setAvatar(null);
+    }
+  }, [user]);
 
   return (
     <View
@@ -58,23 +73,35 @@ export default function Header(props: any) {
       {/* Right: Account and Settings Buttons */}
       <View style={{ flexDirection: "row", gap: 5, alignItems: "center" }}>
         {/* Account Button */}
-        {/* <Link href="/signup" asChild>
-              <Pressable style={styles.button}>
-                <Text style={styles.buttonText}>S'inscrire</Text>
-              </Pressable>
-            </Link> */}
-        <Link href="/login" asChild>
+        {user ? (
           <Pressable
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.7 : 1,
-            })}
+            style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            onPress={() => {
+              // Optional: Navigate to profile
+            }}
           >
             <Image
-              source={{ uri: "https://avatar.iran.liara.run/public" }}
-              style={{ width: 45, height: 45, borderRadius: 20 }}
+              source={{
+                uri:
+                  avatar ||
+                  `https://avatar.iran.liara.run/public?username=${user.username || user.id}`,
+              }}
+              style={{ width: 45, height: 45, borderRadius: 22.5 }}
             />
           </Pressable>
-        </Link>
+        ) : (
+          <Link href="/login" asChild>
+            <Pressable
+              style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
+            >
+              <Ionicons
+                name="person-circle-outline"
+                size={45}
+                color={colors.iconInactive}
+              />
+            </Pressable>
+          </Link>
+        )}
 
         {/* Settings Button */}
         <Link

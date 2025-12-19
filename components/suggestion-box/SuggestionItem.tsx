@@ -1,8 +1,9 @@
 import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
+import { UsersAPI } from "@/api/users";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors, fontSize, fonts, shadows } from "@/styles";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface SuggestionItemProps {
@@ -13,18 +14,29 @@ interface SuggestionItemProps {
 export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
   const { user, getToken } = useAuth();
   const [voting, setVoting] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
 
-  // Formatting date
-  const formattedDate = new Date(suggestion.created_at).toLocaleString(
-    "fr-FR",
-    {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    },
-  );
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userInfo = await UsersAPI.getUserPublicInfo(suggestion.user_id);
+        setAvatar(userInfo.avatar);
+      } catch {
+        // Fallback or ignore
+      }
+    };
+    fetchUser();
+  }, [suggestion.user_id]);
+
+  const formattedDate = new Date(
+    new Date(suggestion.created_at).getTime() + 60 * 60 * 1000,
+  ).toLocaleString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   const handleVote = async (type: "up" | "down") => {
     if (!user) {
@@ -48,10 +60,14 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
 
   return (
     <View style={styles.container}>
-      {/* Header: Avatar + Title + Date */}
+      {/* Avatar + Title + Date */}
       <View style={styles.header}>
         <Image
-          source={{ uri: "https://placehold.co/40x40" }}
+          source={{
+            uri:
+              avatar ||
+              `https://avatar.iran.liara.run/public?username=${suggestion.user_id}`,
+          }}
           style={styles.avatar}
         />
         <View style={styles.headerInfo}>
@@ -63,7 +79,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
       {/* Content */}
       <Text style={styles.content}>{suggestion.content}</Text>
 
-      {/* Footer: Votes */}
+      {/* Votes */}
       <View style={styles.footer}>
         {/* Upvote */}
         <Pressable
@@ -136,7 +152,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     padding: 12,
     borderRadius: 7,
-    marginTop: 20,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: colors.inputBorder,
     ...shadows.light,
@@ -150,7 +166,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 40,
     height: 40,
-    borderRadius: 20, // Circular avatar
+    borderRadius: 20,
   },
   headerInfo: {
     flex: 1,
