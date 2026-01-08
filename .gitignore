@@ -43,4 +43,4 @@ app-example
 /android
 
 # variable constants
-constants\Config.ts
+constants/Config.ts
