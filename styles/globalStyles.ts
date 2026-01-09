@@ -41,7 +41,7 @@ export const commonStyles = StyleSheet.create({
 
   // Textes
   title: {
-    fontSize: fontSize.xlarge,
+    fontSize: fontSize.xl,
     fontWeight: "bold",
     fontFamily: fonts.primaryBold,
     marginBottom: spacing.sm,
@@ -49,7 +49,7 @@ export const commonStyles = StyleSheet.create({
   },
 
   titleLarge: {
-    fontSize: fontSize.xxlarge,
+    fontSize: fontSize["2xl"],
     fontWeight: "bold",
     fontFamily: fonts.primaryBold,
     marginBottom: spacing.sm,
@@ -58,7 +58,7 @@ export const commonStyles = StyleSheet.create({
   },
 
   subtitle: {
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primary,
     marginBottom: spacing.xl,
     textAlign: "center",
@@ -68,13 +68,13 @@ export const commonStyles = StyleSheet.create({
   button: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: borderRadius.medium,
+    borderRadius: borderRadius.m,
     alignItems: "center",
   },
 
   buttonText: {
     color: colors.white,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryMedium,
     fontWeight: "600",
   },
@@ -89,12 +89,12 @@ export const commonStyles = StyleSheet.create({
   option: {
     backgroundColor: colors.white,
     padding: spacing.md,
-    borderRadius: borderRadius.medium,
+    borderRadius: borderRadius.m,
     ...shadows.light,
   },
 
   optionText: {
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryMedium,
     fontWeight: "500",
     color: colors.textDark,
@@ -108,14 +108,14 @@ export const commonStyles = StyleSheet.create({
   backButton: {
     backgroundColor: colors.primary,
     padding: spacing.md,
-    borderRadius: borderRadius.medium,
+    borderRadius: borderRadius.m,
     alignItems: "center",
     marginTop: spacing.xl,
   },
 
   backButtonText: {
     color: colors.white,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryMedium,
     fontWeight: "600",
   },
@@ -167,7 +167,7 @@ export const pageStyles = {
     },
     title: {
       ...commonStyles.title,
-      marginTop: spacing.xxxl,
+      marginTop: spacing["3xl"],
     },
     subtitle: {
       ...commonStyles.subtitle,

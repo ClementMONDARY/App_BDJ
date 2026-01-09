@@ -1,5 +1,11 @@
-import { colors, fonts, spacing } from "@/styles";
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { colors, fontSize, fonts, spacing } from "@/styles";
+import {
+  type StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  type ViewStyle,
+} from "react-native";
 
 interface UnderlinedTitleProps {
   title: string;
@@ -25,7 +31,7 @@ const styles = StyleSheet.create({
   },
   title: {
     color: colors.black,
-    fontSize: 20,
+    fontSize: fontSize.l + 2,
     fontFamily: fonts.primaryBold,
     paddingLeft: spacing.sm,
   },

@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   formTitle: {
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryBold,
     color: colors.black,
     marginBottom: 20,

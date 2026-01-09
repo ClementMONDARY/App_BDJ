@@ -1,5 +1,5 @@
 import { icon } from "@/constants/icons";
-import { colors } from "@/styles";
+import { colors, fonts, fontSize } from "@/styles";
 import { useEffect } from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -75,6 +75,8 @@ export function TabBarButton({
           {
             color: colors.iconInactive,
             textAlign: "center",
+            fontFamily: fonts.primary,
+            fontSize: fontSize.xs,
           },
           animatedTextStyle,
         ]}

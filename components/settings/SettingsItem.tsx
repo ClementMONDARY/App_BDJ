@@ -1,5 +1,5 @@
 import { icon } from "@/constants/icons";
-import { colors } from "@/styles";
+import { colors, fonts, fontSize } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
@@ -137,9 +137,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   label: {
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-    fontWeight: "700",
+    fontSize: fontSize.m,
+    fontFamily: fonts.primaryBold,
   },
   dropdownMock: {
     flexDirection: "row",

@@ -1,6 +1,6 @@
 import { UsersAPI } from "@/api/users";
 import { useAuth } from "@/contexts/AuthContext";
-import { colors } from "@/styles";
+import { colors, fonts } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useEffect, useState } from "react";
@@ -64,6 +64,7 @@ export default function Header(props: any) {
             fontWeight: "600",
             color: colors.iconActive,
             textAlign: "center",
+            fontFamily: fonts.primaryBold,
           }}
         >
           {title}

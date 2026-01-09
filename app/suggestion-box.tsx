@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   formTitle: {
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryBold,
     color: colors.black,
     marginBottom: 5,

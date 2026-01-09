@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: fonts.primaryBold,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     color: colors.black,
   },
   date: {
@@ -201,6 +201,6 @@ const styles = StyleSheet.create({
   },
   voteText: {
     fontFamily: fonts.primaryBold,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
   },
 });

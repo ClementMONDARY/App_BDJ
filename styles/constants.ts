@@ -24,7 +24,7 @@ export const spacing = {
   lg: 20,
   xl: 30,
   "2xl": 40,
-  xxxl: 50,
+  "3xl": 50,
   paddingMain: 15,
 };
 
@@ -45,18 +45,18 @@ export const fonts = {
 // Tailles de police
 export const fontSize = {
   xs: 12,
-  small: 14,
-  medium: 16,
-  large: 18,
-  xlarge: 24,
-  xxlarge: 28,
+  s: 14,
+  m: 16,
+  l: 18,
+  xl: 24,
+  "2xl": 28,
 };
 
 // Rayons de bordure
 export const borderRadius = {
-  small: 5,
-  medium: 10,
-  large: 15,
+  s: 5,
+  m: 10,
+  l: 15,
 };
 
 // Ombres

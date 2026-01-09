@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: colors.white,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryBold,
     fontWeight: "600",
   },

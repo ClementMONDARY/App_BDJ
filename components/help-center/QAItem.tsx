@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   },
   question: {
     color: colors.black,
-    fontSize: fontSize.medium,
+    fontSize: fontSize.m,
     fontFamily: fonts.primaryBold,
     textAlign: "left",
   },
