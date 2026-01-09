@@ -1,5 +1,6 @@
+import type { icon } from "@/constants/icons";
 import { TabBarSvg } from "@/constants/svg";
-import { colors } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { useState } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
@@ -11,6 +12,7 @@ import Animated, {
 import { TabBarButton } from "./TabBarButton";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const { colors } = useTheme();
   const [dimensions, setDimensions] = useState({ width: 100, height: 20 });
   const TAB_BAR_PADDING = 20;
   const BUTTON_MARGIN = 12;
@@ -38,7 +40,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   });
 
   return (
-    <View onLayout={onTabbarLayout} style={styles.tabbar}>
+    <View onLayout={onTabbarLayout} style={[styles.tabbar]}>
       <Animated.View
         style={[
           {
@@ -112,15 +114,9 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
             onPress={onPress}
             onLongPress={onLongPress}
             isFocused={isFocused}
-            routeName={route.name}
-            color={isFocused ? colors.textLight : colors.iconInactive}
+            routeName={route.name as keyof typeof icon}
+            color={isFocused ? colors.white : colors.iconInactive}
             label={label}
-            style={{
-              flex: 1,
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 10,
-            }}
           />
         );
       })}
@@ -137,6 +133,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 20,
-    backgroundColor: "transparent",
+    // Background color is handled dynamically
   },
 });

@@ -1,5 +1,5 @@
 import { icon } from "@/constants/icons";
-import { colors, fonts, fontSize } from "@/styles";
+import { colors, fontSize, fonts } from "@/styles";
 import { useEffect } from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -20,7 +20,7 @@ export function TabBarButton({
   onPress: () => void;
   onLongPress: () => void;
   isFocused: boolean;
-  routeName: string;
+  routeName: keyof typeof icon;
   color: string;
   label: string;
 }) {

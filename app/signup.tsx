@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { colors } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fonts, type ThemeColors } from "@/styles";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -24,6 +26,8 @@ export default function Signup() {
   const [lastname, setLastname] = useState("");
   const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -51,8 +55,10 @@ export default function Signup() {
       Alert.alert("Succès", "Compte créé avec succès", [
         { text: "OK", onPress: () => router.replace("/") },
       ]);
-    } catch (error: any) {
-      Alert.alert("Erreur", error.message || "Une erreur est survenue");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Une erreur est survenue";
+      Alert.alert("Erreur", message);
     } finally {
       setLoading(false);
     }
@@ -61,7 +67,7 @@ export default function Signup() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: colors.backgroundLight }}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
       <View
         style={[
@@ -78,7 +84,7 @@ export default function Signup() {
               <TextInput
                 style={styles.input}
                 placeholder="Votre prénom"
-                placeholderTextColor={colors.iconInactive}
+                placeholderTextColor={colors.textSecondary}
                 value={firstname}
                 onChangeText={setFirstname}
               />
@@ -88,7 +94,7 @@ export default function Signup() {
               <TextInput
                 style={styles.input}
                 placeholder="Votre nom"
-                placeholderTextColor={colors.iconInactive}
+                placeholderTextColor={colors.textSecondary}
                 value={lastname}
                 onChangeText={setLastname}
               />
@@ -100,7 +106,7 @@ export default function Signup() {
             <TextInput
               style={styles.input}
               placeholder="Votre nom d'utilisateur"
-              placeholderTextColor={colors.iconInactive}
+              placeholderTextColor={colors.textSecondary}
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
@@ -112,7 +118,7 @@ export default function Signup() {
             <TextInput
               style={styles.input}
               placeholder="exemple@email.com"
-              placeholderTextColor={colors.iconInactive}
+              placeholderTextColor={colors.textSecondary}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -126,7 +132,7 @@ export default function Signup() {
               <TextInput
                 style={styles.input}
                 placeholder="Votre mot de passe"
-                placeholderTextColor={colors.iconInactive}
+                placeholderTextColor={colors.textSecondary}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -137,7 +143,7 @@ export default function Signup() {
               <TextInput
                 style={styles.input}
                 placeholder="Confirmez votre mot de passe"
-                placeholderTextColor={colors.iconInactive}
+                placeholderTextColor={colors.textSecondary}
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry
@@ -154,7 +160,7 @@ export default function Signup() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={colors.black} />
+              <ActivityIndicator color={colors.white} />
             ) : (
               <Text style={styles.buttonText}>S'inscrire</Text>
             )}
@@ -174,72 +180,80 @@ export default function Signup() {
   );
 }
 
-const styles = StyleSheet.create({
-  inputRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  inputHalfWidth: {
-    width: "48%",
-    marginBottom: 0,
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.textDark,
-    marginBottom: 40,
-    textAlign: "center",
-  },
-  form: {
-    gap: 20,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    color: colors.textDark,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  input: {
-    backgroundColor: colors.backgroundLight,
-    borderRadius: 12,
-    padding: 16,
-    color: colors.textDark,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#333",
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: colors.textLight,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  footerText: {
-    color: colors.iconInactive,
-    fontSize: 14,
-  },
-  link: {
-    color: colors.textDark,
-    fontSize: 14,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    inputRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    inputHalfWidth: {
+      width: "48%",
+      marginBottom: 0,
+    },
+    container: {
+      flex: 1,
+      paddingHorizontal: 24,
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontSize: 32,
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 40,
+      textAlign: "center",
+      fontFamily: fonts.primaryBold,
+    },
+    form: {
+      gap: 20,
+    },
+    inputGroup: {
+      gap: 8,
+    },
+    label: {
+      color: colors.text,
+      fontSize: 16,
+      fontWeight: "500",
+      fontFamily: fonts.primary,
+    },
+    input: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 12,
+      padding: 16,
+      color: colors.text,
+      fontSize: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      fontFamily: fonts.primary,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      padding: 16,
+      alignItems: "center",
+      marginTop: 10,
+    },
+    buttonText: {
+      color: colors.white,
+      fontSize: 16,
+      fontWeight: "bold",
+      fontFamily: fonts.primaryBold,
+    },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      marginTop: 20,
+    },
+    footerText: {
+      color: colors.textSecondary,
+      fontSize: 14,
+      fontFamily: fonts.primary,
+    },
+    link: {
+      color: colors.text,
+      fontSize: 14,
+      fontWeight: "bold",
+      textDecorationLine: "underline",
+      fontFamily: fonts.primaryBold,
+    },
+  });

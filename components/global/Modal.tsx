@@ -1,4 +1,6 @@
-import { colors } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import type { ThemeColors } from "@/styles/constants";
 import type React from "react";
 import {
   Modal as RNModal,
@@ -37,6 +39,9 @@ export function Modal({
   primaryButton,
   secondaryButton,
 }: ModalProps) {
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
+
   let headerColor = colors.primary;
   let primaryBtnColor = colors.primary;
 
@@ -44,7 +49,7 @@ export function Modal({
     headerColor = "#E8A302";
     primaryBtnColor = "#E8A302";
   } else if (type === "danger") {
-    headerColor = colors.error; // Assuming colors.error exists, typically #CD0000 or red
+    headerColor = colors.error;
     primaryBtnColor = colors.error;
   }
 
@@ -101,73 +106,74 @@ export function Modal({
   );
 }
 
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContainer: {
-    width: "100%",
-    maxWidth: 400,
-    backgroundColor: "white",
-    borderRadius: 10,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 20,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  content: {
-    padding: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-    fontFamily: "Roboto Mono",
-  },
-  body: {
-    marginBottom: 20,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  primaryButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  primaryButtonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-  },
-  secondaryButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 5,
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-  },
-  secondaryButtonText: {
-    color: "#333",
-    fontWeight: "bold",
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-  },
-});
+    modalContainer: {
+      width: "100%",
+      maxWidth: 400,
+      backgroundColor: colors.surface,
+      borderRadius: 10,
+      overflow: "hidden",
+      shadowColor: colors.shadow,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    content: {
+      padding: 20,
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 15,
+      textAlign: "center",
+      fontFamily: "Roboto Mono",
+    },
+    body: {
+      marginBottom: 20,
+    },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    primaryButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    primaryButtonText: {
+      color: colors.white, // Text on button usually white
+      fontWeight: "bold",
+      fontSize: 16,
+      fontFamily: "Roboto Mono",
+    },
+    secondaryButton: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 5,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    secondaryButtonText: {
+      color: colors.text,
+      fontWeight: "bold",
+      fontSize: 16,
+      fontFamily: "Roboto Mono",
+    },
+  });

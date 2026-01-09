@@ -2,24 +2,33 @@ import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
 export const icon = {
-  index: (props: React.ComponentProps<typeof Ionicons>, focused: boolean) => (
-    <Ionicons {...props} name={focused ? "home" : "home-outline"} />
-  ),
-  forum: (props: React.ComponentProps<typeof Ionicons>, focused: boolean) => (
+  index: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => <Ionicons {...props} name={focused ? "home" : "home-outline"} />,
+  forum: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => (
     <Ionicons {...props} name={focused ? "megaphone" : "megaphone-outline"} />
   ),
-  events: (props: React.ComponentProps<typeof Ionicons>, focused: boolean) => (
-    <Ionicons {...props} name={focused ? "calendar" : "calendar-outline"} />
-  ),
-  alerts: (props: React.ComponentProps<typeof Ionicons>, focused: boolean) => (
+  events: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => <Ionicons {...props} name={focused ? "calendar" : "calendar-outline"} />,
+  alerts: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => (
     <Ionicons
       {...props}
       name={focused ? "notifications" : "notifications-outline"}
     />
   ),
-  admin: (props: React.ComponentProps<typeof Ionicons>, focused: boolean) => (
-    <Ionicons {...props} name={focused ? "shield" : "shield-outline"} />
-  ),
+  admin: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => <Ionicons {...props} name={focused ? "shield" : "shield-outline"} />,
   "thumbs-up": (props: any, focused: boolean) => {
     // Props contains color (e.g. #929292 or primary) and size
     return (

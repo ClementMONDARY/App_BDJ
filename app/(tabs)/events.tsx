@@ -1,7 +1,9 @@
-import { colors } from "@/styles";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import type { ThemeColors } from "@/styles";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Events() {
+  const styles = useThemeStyles(createStyles);
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Events</Text>
@@ -9,15 +11,16 @@ export default function Events() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: colors.backgroundLight,
-  },
-  text: {
-    color: colors.textDark,
-    fontSize: 24,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.background,
+    },
+    text: {
+      color: colors.text,
+      fontSize: 24,
+    },
+  });

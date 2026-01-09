@@ -4,8 +4,10 @@ import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { UnderlinedTitle } from "@/components/global/text/UnderlinedTitle";
 import { QAItem } from "@/components/help-center/QAItem";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
-import { colors, fontSize, fonts, spacing } from "@/styles";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -22,6 +24,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HelpCenter() {
   const { user, getToken } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -74,8 +78,11 @@ export default function HelpCenter() {
       Alert.alert("Succès", "Votre question a été envoyée !");
       setNewQuestion("");
       refetch();
-    } catch (error: any) {
-      Alert.alert("Erreur", error.message || "Une erreur est survenue.");
+      refetch();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Une erreur est survenue.";
+      Alert.alert("Erreur", message);
       console.error(error);
     } finally {
       setSubmitting(false);
@@ -120,7 +127,7 @@ export default function HelpCenter() {
       <Stack.Screen options={{ title: "Centre d'aide" }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
+        style={{ flex: 1, backgroundColor: colors.background }}
         keyboardVerticalOffset={100}
       >
         <FlatList
@@ -152,30 +159,32 @@ export default function HelpCenter() {
   );
 }
 
-const styles = StyleSheet.create({
-  listContent: {
-    padding: spacing.paddingMain,
-  },
-  headerContainer: {
-    marginBottom: 0,
-    gap: 30,
-  },
-  emptyText: {
-    textAlign: "center",
-    color: colors.iconInactive,
-    fontFamily: fonts.primary,
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  formContainer: {
-    marginTop: spacing.md,
-    backgroundColor: colors.backgroundLight,
-    gap: 20,
-  },
-  formTitle: {
-    fontSize: fontSize.m,
-    fontFamily: fonts.primaryBold,
-    color: colors.black,
-    marginBottom: 20,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    listContent: {
+      padding: spacing.paddingMain,
+      backgroundColor: colors.background, // Ensure seamless background
+    },
+    headerContainer: {
+      marginBottom: 0,
+      gap: 30,
+    },
+    emptyText: {
+      textAlign: "center",
+      color: colors.iconInactive,
+      fontFamily: fonts.primary,
+      marginTop: 20,
+      marginBottom: 40,
+    },
+    formContainer: {
+      marginTop: spacing.md,
+      backgroundColor: colors.background, // Match page background
+      gap: 20,
+    },
+    formTitle: {
+      fontSize: fontSize.m,
+      fontFamily: fonts.primaryBold,
+      color: colors.text,
+      marginBottom: 20,
+    },
+  });

@@ -5,7 +5,9 @@ import { SettingsItem } from "@/components/settings/SettingsItem";
 import { CONFIG } from "@/constants/Config";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
-import { colors, fonts, fontSize } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fontSize, fonts, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -21,6 +23,9 @@ import {
 
 export default function Settings() {
   const { user, signOut, getToken } = useAuth();
+  const { colors, setTheme, isDark } = useTheme();
+
+  const styles = useThemeStyles(createStyles);
   const router = useRouter();
 
   const [avatar, setAvatar] = useState<string | null>(null);
@@ -48,7 +53,6 @@ export default function Settings() {
     lastName !== initialUserData.lastName ||
     email !== initialUserData.email;
 
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const [textSize, setTextSize] = useState("Normal");
 
   // Account Deletion State
@@ -237,6 +241,10 @@ export default function Settings() {
     }
   };
 
+  const toggleTheme = (value: boolean) => {
+    setTheme(value ? "dark" : "light");
+  };
+
   return (
     <>
       <ScrollView style={styles.contentContainer}>
@@ -365,8 +373,8 @@ export default function Settings() {
             type="bool"
             icon="moon"
             label="Mode Sombre"
-            value={isDarkMode}
-            onValueChange={setIsDarkMode}
+            value={isDark}
+            onValueChange={toggleTheme}
           />
 
           <SettingsItem
@@ -482,7 +490,7 @@ export default function Settings() {
           style={{
             marginBottom: 10,
             textAlign: "center",
-            color: colors.textDark,
+            color: colors.text,
           }}
         >
           Cette action est irréversible. Toutes vos données seront perdues.
@@ -491,7 +499,7 @@ export default function Settings() {
           style={{
             marginBottom: 10,
             textAlign: "center",
-            color: colors.textDark,
+            color: colors.text,
             fontWeight: "bold",
           }}
         >
@@ -509,104 +517,107 @@ export default function Settings() {
   );
 }
 
-const styles = StyleSheet.create({
-  contentContainer: {
-    padding: 12,
-    gap: 15,
-  },
-  profileHeader: {
-    paddingVertical: 12,
-    alignItems: "center",
-    width: "100%",
-  },
-  avatarWrapper: {
-    justifyContent: "flex-end",
-    alignItems: "flex-end",
-    position: "relative",
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  statusIndicator: {
-    width: 24,
-    height: 24,
-    position: "absolute",
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary, // Using primary color from tokens
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: colors.backgroundLight,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fieldsContainer: {
-    width: "100%",
-    gap: 20,
-    marginBottom: 30,
-  },
-  inputGroup: {
-    gap: 5,
-    width: "100%",
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-    fontWeight: "700",
-    color: colors.black,
-    textTransform: "uppercase",
-  },
-  saveButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  saveButtonDisabled: {
-    backgroundColor: "#ccc",
-  },
-  saveButtonText: {
-    color: colors.white,
-    fontWeight: "bold",
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-  },
-  settingsContainer: {
-    width: "100%",
-    gap: 5,
-    marginTop: 10,
-  },
-  divider: {
-    height: 2,
-    backgroundColor: "#D9D9D9",
-    borderRadius: 5,
-    width: "100%",
-    marginVertical: 10,
-  },
-  notConnectedContainer: {
-    paddingVertical: 30,
-    alignItems: "center",
-    gap: 20,
-  },
-  notConnectedText: {
-    fontFamily: fonts.primary,
-    fontSize: 16,
-    color: colors.textDark,
-    textAlign: "center",
-  },
-  loginButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 8,
-  },
-  loginButtonText: {
-    color: colors.white,
-    fontFamily: fonts.primaryBold,
-    fontSize: fontSize.m,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    contentContainer: {
+      padding: 12,
+      gap: 15,
+      backgroundColor: colors.background, // Ensure background is themed
+      flex: 1, // Needed for full screen background
+    },
+    profileHeader: {
+      paddingVertical: 12,
+      alignItems: "center",
+      width: "100%",
+    },
+    avatarWrapper: {
+      justifyContent: "flex-end",
+      alignItems: "flex-end",
+      position: "relative",
+    },
+    avatar: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+    },
+    statusIndicator: {
+      width: 24,
+      height: 24,
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: colors.background, // Match background
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    fieldsContainer: {
+      width: "100%",
+      gap: 20,
+      marginBottom: 30,
+    },
+    inputGroup: {
+      gap: 5,
+      width: "100%",
+    },
+    label: {
+      fontSize: 16,
+      fontFamily: "Roboto Mono",
+      fontWeight: "700",
+      color: colors.text,
+      textTransform: "uppercase",
+    },
+    saveButton: {
+      backgroundColor: colors.primary,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: 10,
+    },
+    saveButtonDisabled: {
+      backgroundColor: colors.iconInactive,
+    },
+    saveButtonText: {
+      color: colors.white,
+      fontWeight: "bold",
+      fontSize: 16,
+      fontFamily: "Roboto Mono",
+    },
+    settingsContainer: {
+      width: "100%",
+      gap: 5,
+      marginTop: 10,
+    },
+    divider: {
+      height: 2,
+      backgroundColor: colors.border,
+      borderRadius: 5,
+      width: "100%",
+      marginVertical: 10,
+    },
+    notConnectedContainer: {
+      paddingVertical: 30,
+      alignItems: "center",
+      gap: 20,
+    },
+    notConnectedText: {
+      fontFamily: fonts.primary,
+      fontSize: 16,
+      color: colors.text,
+      textAlign: "center",
+    },
+    loginButton: {
+      backgroundColor: colors.primary,
+      paddingVertical: 12,
+      paddingHorizontal: 30,
+      borderRadius: 8,
+    },
+    loginButtonText: {
+      color: colors.white,
+      fontFamily: fonts.primaryBold,
+      fontSize: fontSize.m,
+    },
+  });

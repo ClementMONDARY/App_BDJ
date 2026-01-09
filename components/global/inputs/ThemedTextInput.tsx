@@ -41,7 +41,7 @@ export const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: {
-      backgroundColor: colors.surface,
+      backgroundColor: colors.inputBackground,
       borderRadius: borderRadius.m,
       ...shadows.light,
       borderWidth: 1,

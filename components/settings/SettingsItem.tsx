@@ -52,14 +52,14 @@ export function SettingsItem({
 
   if (isDestructive) {
     backgroundColor = colors.error;
-    textColor = colors.white;
-    iconColor = colors.white;
-    chevronColor = colors.white;
+    textColor = colors.textWhite;
+    iconColor = colors.textWhite;
+    chevronColor = colors.textWhite;
   } else if (isWarning) {
     backgroundColor = "#E8A302";
-    textColor = colors.white;
-    iconColor = colors.white;
-    chevronColor = colors.white;
+    textColor = colors.textWhite;
+    iconColor = colors.textWhite;
+    chevronColor = colors.textWhite;
   }
 
   const renderRightContent = () => {
@@ -70,7 +70,7 @@ export function SettingsItem({
             value={value}
             onValueChange={onValueChange}
             trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={colors.white}
+            thumbColor={colors.textWhite}
           />
         );
       case "select":
