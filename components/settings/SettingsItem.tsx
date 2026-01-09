@@ -1,5 +1,7 @@
 import { icon } from "@/constants/icons";
-import { colors, fonts, fontSize } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fontSize, fonts, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
@@ -9,7 +11,7 @@ export type IconName = keyof typeof icon;
 
 interface SettingsItemProps {
   type: SettingsItemType;
-  icon: IconName;
+  icon?: IconName;
   label: string;
   // For 'bool'
   value?: boolean;
@@ -20,8 +22,8 @@ interface SettingsItemProps {
   href?: string;
   onPress?: () => void;
   // Appearance
-  isDestructive?: boolean; // For red delete button
-  isWarning?: boolean; // For orange logout button
+  isDestructive?: boolean;
+  isWarning?: boolean;
 }
 
 export function SettingsItem({
@@ -36,16 +38,20 @@ export function SettingsItem({
   isDestructive,
   isWarning,
 }: SettingsItemProps) {
-  const IconComponent = icon[iconName] as any;
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
+  const IconComponent = iconName ? (icon[iconName] as any) : null;
 
   // Determine colors based on state
-  let textColor = colors.textDark;
-  let iconColor = colors.textDark;
+  let textColor = colors.text;
+  let iconColor = colors.text;
   let backgroundColor = "transparent";
-  let chevronColor = colors.textDark;
+  let chevronColor = colors.text;
+  const dropdownBorderColor = colors.border;
+  const dropdownTextColor = colors.textSecondary;
 
   if (isDestructive) {
-    backgroundColor = colors.error; // #CD0000 or similar
+    backgroundColor = colors.error;
     textColor = colors.white;
     iconColor = colors.white;
     chevronColor = colors.white;
@@ -63,13 +69,18 @@ export function SettingsItem({
           <Switch
             value={value}
             onValueChange={onValueChange}
-            trackColor={{ false: colors.inputBorder, true: colors.primary }}
+            trackColor={{ false: colors.border, true: colors.primary }}
+            thumbColor={colors.white}
           />
         );
       case "select":
         return (
-          <View style={styles.dropdownMock}>
-            <Text style={styles.dropdownText}>{selectedValue}</Text>
+          <View
+            style={[styles.dropdownMock, { borderColor: dropdownBorderColor }]}
+          >
+            <Text style={[styles.dropdownText, { color: dropdownTextColor }]}>
+              {selectedValue}
+            </Text>
             <Ionicons
               name="caret-down-outline"
               size={12}
@@ -110,51 +121,49 @@ export function SettingsItem({
   }
 
   if (type === "action" || type === "select") {
-    // Select might be clickable to open modal in future
     return <TouchableOpacity onPress={onPress}>{Content}</TouchableOpacity>;
   }
 
   return <View>{Content}</View>;
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 12, // Added padding for background color cases
-    borderRadius: 5,
-  },
-  leftContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 15,
-  },
-  iconContainer: {
-    width: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  label: {
-    fontSize: fontSize.m,
-    fontFamily: fonts.primaryBold,
-  },
-  dropdownMock: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    borderRadius: 3,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    gap: 5,
-    minWidth: 100,
-    justifyContent: "space-between",
-  },
-  dropdownText: {
-    fontSize: 16,
-    fontFamily: "Roboto Mono",
-    color: colors.iconInactive,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 12,
+      paddingHorizontal: 12,
+      borderRadius: 5,
+    },
+    leftContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 15,
+    },
+    iconContainer: {
+      width: 20,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    label: {
+      fontSize: fontSize.m,
+      fontFamily: fonts.primaryBold,
+    },
+    dropdownMock: {
+      flexDirection: "row",
+      alignItems: "center",
+      borderWidth: 1,
+      borderRadius: 3,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      gap: 5,
+      minWidth: 100,
+      justifyContent: "space-between",
+    },
+    dropdownText: {
+      fontSize: 16,
+      fontFamily: "Roboto Mono",
+    },
+  });

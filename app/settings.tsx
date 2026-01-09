@@ -5,7 +5,8 @@ import { SettingsItem } from "@/components/settings/SettingsItem";
 import { CONFIG } from "@/constants/Config";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
-import { colors } from "@/styles";
+import { colors, fonts, fontSize } from "@/styles";
+import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -29,6 +30,24 @@ export default function Settings() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState(user?.email || "");
 
+  const [initialUserData, setInitialUserData] = useState({
+    pseudo: user?.username || "",
+    bio: "",
+    firstName: "",
+    lastName: "",
+    email: user?.email || "",
+  });
+
+  const [isUpdating, setIsUpdating] = useState(false);
+
+  // Check if there are changes
+  const hasChanges =
+    pseudo !== initialUserData.pseudo ||
+    bio !== initialUserData.bio ||
+    firstName !== initialUserData.firstName ||
+    lastName !== initialUserData.lastName ||
+    email !== initialUserData.email;
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [textSize, setTextSize] = useState("Normal");
 
@@ -36,6 +55,13 @@ export default function Settings() {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [deleteEmailConfirmation, setDeleteEmailConfirmation] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Password Update State
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -57,6 +83,15 @@ export default function Settings() {
             setBio(data.bio || "");
             setFirstName(data.firstname || "");
             setLastName(data.lastname || "");
+
+            // Set initial data for comparison
+            setInitialUserData({
+              pseudo: data.username || "",
+              bio: data.bio || "",
+              firstName: data.firstname || "",
+              lastName: data.lastname || "",
+              email: data.email || "",
+            });
           }
         }
       } catch (error) {
@@ -70,6 +105,69 @@ export default function Settings() {
       fetchUserData();
     }
   }, [user, getToken]);
+
+  const handleSave = async () => {
+    if (!user || !hasChanges) return;
+
+    setIsUpdating(true);
+    try {
+      const token = await getToken();
+      if (token) {
+        await UsersAPI.updateUser(user.id.toString(), token, {
+          username: pseudo,
+          bio: bio,
+          firstname: firstName,
+          lastname: lastName,
+          email: email,
+        });
+
+        // Update initial data to current values
+        setInitialUserData({
+          pseudo,
+          bio,
+          firstName,
+          lastName,
+          email,
+        });
+
+        alert("Profil mis à jour avec succès !");
+      }
+    } catch (error) {
+      console.error("Failed to update profile", error);
+      alert("Erreur lors de la mise à jour du profil");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handlePasswordUpdate = async () => {
+    if (!user) return;
+    if (newPassword !== confirmPassword) {
+      alert("Les nouveaux mots de passe ne correspondent pas");
+      return;
+    }
+    if (newPassword.length < 8) {
+      alert("Le mot de passe doit contenir au moins 8 caractères");
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const token = await getToken();
+      if (token) {
+        await UsersAPI.updateUser(user.id.toString(), token, {
+          password: newPassword,
+        });
+        alert("Mot de passe mis à jour avec succès");
+        setIsPasswordModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Failed to update password", error);
+      alert("Erreur lors de la mise à jour du mot de passe");
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -142,81 +240,124 @@ export default function Settings() {
   return (
     <>
       <ScrollView style={styles.contentContainer}>
-        {/* Header Profile Section */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatarWrapper}>
-            <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.8}>
-              <Image
-                source={{
-                  uri:
-                    avatar ||
-                    `https://avatar.iran.liara.run/public?username=${user?.username || "User"}`,
-                }}
-                style={styles.avatar}
+        {!user ? (
+          <View style={styles.notConnectedContainer}>
+            <View style={styles.avatarWrapper}>
+              <Ionicons
+                name="person-circle-outline"
+                size={100}
+                color={colors.iconInactive}
               />
-              <View style={styles.statusIndicator}>
-                {icon.camera({ size: 14, color: colors.white }, true)}
-              </View>
+            </View>
+            <Text style={styles.notConnectedText}>
+              Vous n'êtes pas connecté.
+            </Text>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.loginButtonText}>SE CONNECTER</Text>
             </TouchableOpacity>
           </View>
-        </View>
+        ) : (
+          <>
+            {/* Header Profile Section */}
+            <View style={styles.profileHeader}>
+              <View style={styles.avatarWrapper}>
+                <TouchableOpacity
+                  onPress={handleAvatarPick}
+                  activeOpacity={0.8}
+                >
+                  <Image
+                    source={{
+                      uri:
+                        avatar ||
+                        `https://avatar.iran.liara.run/public?username=${
+                          user?.username || "User"
+                        }`,
+                    }}
+                    style={styles.avatar}
+                  />
+                  <View style={styles.statusIndicator}>
+                    {icon.camera({ size: 14, color: colors.white }, true)}
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </View>
 
-        {/* Fields Section */}
-        <View style={styles.fieldsContainer}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>PSEUDO</Text>
-            <ThemedTextInput
-              value={pseudo}
-              onChangeText={setPseudo}
-              placeholder="Votre pseudo"
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>BIOGRAPHIE</Text>
-            <ThemedTextInput
-              value={bio}
-              onChangeText={setBio}
-              placeholder="Votre biographie"
-              multiline
-              numberOfLines={4}
-              style={{ height: 100 }}
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>NOM</Text>
-            <ThemedTextInput
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder="Votre nom"
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>PRÉNOM</Text>
-            <ThemedTextInput
-              value={firstName}
-              onChangeText={setFirstName}
-              placeholder="Votre prénom"
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>EMAIL</Text>
-            <ThemedTextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="votre@email.com"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-          </View>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>MOT DE PASSE</Text>
-            <ThemedTextInput
-              value="*************"
-              editable={false}
-              placeholder="*************"
-            />
-          </View>
-        </View>
+            {/* Fields Section */}
+            <View style={styles.fieldsContainer}>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>PSEUDO</Text>
+                <ThemedTextInput
+                  value={pseudo}
+                  onChangeText={setPseudo}
+                  placeholder="Votre pseudo"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>BIOGRAPHIE</Text>
+                <ThemedTextInput
+                  value={bio}
+                  onChangeText={setBio}
+                  placeholder="Votre biographie"
+                  multiline
+                  numberOfLines={4}
+                  style={{ height: 100 }}
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>NOM</Text>
+                <ThemedTextInput
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder="Votre nom"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>PRÉNOM</Text>
+                <ThemedTextInput
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  placeholder="Votre prénom"
+                />
+              </View>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>EMAIL</Text>
+                <ThemedTextInput
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder="votre@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+              <SettingsItem
+                type="action"
+                label="Modifier le mot de passe"
+                onPress={() => {
+                  setCurrentPassword("");
+                  setNewPassword("");
+                  setConfirmPassword("");
+                  setIsPasswordModalVisible(true);
+                }}
+              />
+
+              <TouchableOpacity
+                style={[
+                  styles.saveButton,
+                  (!hasChanges || isUpdating) && styles.saveButtonDisabled,
+                ]}
+                onPress={handleSave}
+                disabled={!hasChanges || isUpdating}
+              >
+                <Text style={styles.saveButtonText}>
+                  {isUpdating ? "ENREGISTREMENT..." : "SAUVEGARDER"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
 
         {/* Settings Options Section using SettingsItem */}
         <View style={styles.settingsContainer}>
@@ -254,32 +395,73 @@ export default function Settings() {
             href="/suggestion-box"
           />
 
-          <View style={styles.divider} />
+          {user && (
+            <>
+              <View style={styles.divider} />
 
-          <SettingsItem
-            type="action"
-            icon="disconnect"
-            label="Se déconnecter"
-            isWarning
-            onPress={handleLogout}
-          />
+              <SettingsItem
+                type="action"
+                icon="disconnect"
+                label="Se déconnecter"
+                isWarning
+                onPress={handleLogout}
+              />
 
-          <SettingsItem
-            type="action"
-            icon="trashbin"
-            label="Supprimer mon compte"
-            isDestructive
-            onPress={() => {
-              setDeleteEmailConfirmation("");
-              setIsDeleteModalVisible(true);
-            }}
-          />
+              <SettingsItem
+                type="action"
+                icon="trashbin"
+                label="Supprimer mon compte"
+                isDestructive
+                onPress={() => {
+                  setDeleteEmailConfirmation("");
+                  setIsDeleteModalVisible(true);
+                }}
+              />
+            </>
+          )}
 
           <View style={{ height: 80 }} />
         </View>
       </ScrollView>
 
-      {/* Delete Account Modal */}
+      {/* Password Update Modal */}
+      <Modal
+        visible={isPasswordModalVisible}
+        onClose={() => setIsPasswordModalVisible(false)}
+        title="Modifier le mot de passe"
+        type="info"
+        primaryButton={{
+          label: "Mettre à jour",
+          onPress: handlePasswordUpdate,
+          loading: isUpdatingPassword,
+          disabled: !currentPassword || !newPassword || !confirmPassword,
+        }}
+        secondaryButton={{
+          label: "Annuler",
+          onPress: () => setIsPasswordModalVisible(false),
+        }}
+      >
+        <View style={{ gap: 15 }}>
+          <ThemedTextInput
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            placeholder="Mot de passe actuel"
+            secureTextEntry
+          />
+          <ThemedTextInput
+            value={newPassword}
+            onChangeText={setNewPassword}
+            placeholder="Nouveau mot de passe"
+            secureTextEntry
+          />
+          <ThemedTextInput
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            placeholder="Confirmer le nouveau mot de passe"
+            secureTextEntry
+          />
+        </View>
+      </Modal>
       <Modal
         visible={isDeleteModalVisible}
         onClose={() => setIsDeleteModalVisible(false)}
@@ -376,6 +558,23 @@ const styles = StyleSheet.create({
     color: colors.black,
     textTransform: "uppercase",
   },
+  saveButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  saveButtonDisabled: {
+    backgroundColor: "#ccc",
+  },
+  saveButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
+    fontSize: 16,
+    fontFamily: "Roboto Mono",
+  },
   settingsContainer: {
     width: "100%",
     gap: 5,
@@ -387,5 +586,27 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     width: "100%",
     marginVertical: 10,
+  },
+  notConnectedContainer: {
+    paddingVertical: 30,
+    alignItems: "center",
+    gap: 20,
+  },
+  notConnectedText: {
+    fontFamily: fonts.primary,
+    fontSize: 16,
+    color: colors.textDark,
+    textAlign: "center",
+  },
+  loginButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 8,
+  },
+  loginButtonText: {
+    color: colors.white,
+    fontFamily: fonts.primaryBold,
+    fontSize: fontSize.m,
   },
 });

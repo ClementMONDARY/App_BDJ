@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
 
 ### 📦 Component Creation Checklist
 - [ ] Is it generic? -> Put in `/components`.
+- [ ] Could it be used in multiple pages? -> Put in `/components` and configure if for cover a wide range of options.
 - [ ] Is it page-specific? -> Keep it near the page or in a `components` sub-folder if complex.
 - [ ] Define accurate TypeScript interfaces.
 - [ ] Use `colors` and `spacing` constants.
