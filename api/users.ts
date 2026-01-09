@@ -46,4 +46,39 @@ export const UsersAPI = {
       throw error;
     }
   },
+
+  uploadAvatar: async (
+    imageUri: string,
+    token: string,
+  ): Promise<{ avatar: string }> => {
+    try {
+      const formData = new FormData();
+
+      // @ts-expect-error - React Native FormData expects specific object structure
+      formData.append("file", {
+        uri: imageUri,
+        name: "avatar.jpg",
+        type: "image/jpeg",
+      });
+
+      const response = await fetch(`${CONFIG.API_URL}/users/me/avatar`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to upload avatar");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      throw error;
+    }
+  },
 };

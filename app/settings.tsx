@@ -6,9 +6,17 @@ import { CONFIG } from "@/constants/Config";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
+import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Settings() {
   const { user, signOut, getToken } = useAuth();
@@ -68,6 +76,50 @@ export default function Settings() {
     router.replace("/login");
   };
 
+  const handleAvatarPick = async () => {
+    try {
+      // Request permissions
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        alert("Sorry, we need camera roll permissions to make this work!");
+        return;
+      }
+
+      // Launch picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets[0].uri) {
+        const token = await getToken();
+        if (token) {
+          // Optimistic update
+          const oldAvatar = avatar;
+          setAvatar(result.assets[0].uri);
+
+          try {
+            const response = await UsersAPI.uploadAvatar(
+              result.assets[0].uri,
+              token,
+            );
+            // Confirm with server url
+            setAvatar(response.avatar);
+          } catch (error) {
+            // Revert on failure
+            setAvatar(oldAvatar);
+            alert("Erreur lors de la mise à jour de l'avatar");
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Avatar pick error:", error);
+    }
+  };
+
   const handleDeleteAccount = async () => {
     if (!user) return;
     setIsDeleting(true);
@@ -93,17 +145,19 @@ export default function Settings() {
         {/* Header Profile Section */}
         <View style={styles.profileHeader}>
           <View style={styles.avatarWrapper}>
-            <Image
-              source={{
-                uri:
-                  avatar ||
-                  `https://avatar.iran.liara.run/public?username=${user?.username || "User"}`,
-              }}
-              style={styles.avatar}
-            />
-            <View style={styles.statusIndicator}>
-              {icon.camera({ size: 14, color: colors.white }, true)}
-            </View>
+            <TouchableOpacity onPress={handleAvatarPick} activeOpacity={0.8}>
+              <Image
+                source={{
+                  uri:
+                    avatar ||
+                    `https://avatar.iran.liara.run/public?username=${user?.username || "User"}`,
+                }}
+                style={styles.avatar}
+              />
+              <View style={styles.statusIndicator}>
+                {icon.camera({ size: 14, color: colors.white }, true)}
+              </View>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -324,7 +378,7 @@ const styles = StyleSheet.create({
   },
   settingsContainer: {
     width: "100%",
-    gap: 5, // Reduced gap as items have padding
+    gap: 5,
     marginTop: 10,
   },
   divider: {

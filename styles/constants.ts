@@ -23,7 +23,7 @@ export const spacing = {
   md: 15,
   lg: 20,
   xl: 30,
-  xxl: 40,
+  "2xl": 40,
   xxxl: 50,
   paddingMain: 15,
 };

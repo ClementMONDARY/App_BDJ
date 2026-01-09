@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 6,
     gap: 6,
-    marginBottom: spacing.xxl,
+    marginBottom: spacing["2xl"],
   },
   question: {
     color: colors.black,
