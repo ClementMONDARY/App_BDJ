@@ -1,6 +1,9 @@
+import { UsersAPI } from "@/api/users";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
+import { Modal } from "@/components/global/Modal";
 import { SettingsItem } from "@/components/settings/SettingsItem";
 import { CONFIG } from "@/constants/Config";
+import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { colors } from "@/styles";
 import { useRouter } from "expo-router";
@@ -20,6 +23,11 @@ export default function Settings() {
 
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [textSize, setTextSize] = useState("Normal");
+
+  // Account Deletion State
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [deleteEmailConfirmation, setDeleteEmailConfirmation] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -60,140 +68,208 @@ export default function Settings() {
     router.replace("/login");
   };
 
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setIsDeleting(true);
+    try {
+      const token = await getToken();
+      if (token) {
+        await UsersAPI.deleteAccount(user.id.toString(), token);
+        await signOut();
+        router.replace("/login");
+      }
+    } catch (error) {
+      console.error("Failed to delete account", error);
+      // Ideally show a toast or alert here
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalVisible(false);
+    }
+  };
+
   return (
-    <ScrollView style={styles.contentContainer}>
-      {/* Header Profile Section */}
-      <View style={styles.profileHeader}>
-        <View style={styles.avatarWrapper}>
-          <Image
-            source={{
-              uri:
-                avatar ||
-                `https://avatar.iran.liara.run/public?username=${user?.username || "User"}`,
-            }}
-            style={styles.avatar}
-          />
-          <View style={styles.statusIndicator}>
-            <View style={styles.statusInner} />
-            <View style={styles.statusDot} />
+    <>
+      <ScrollView style={styles.contentContainer}>
+        {/* Header Profile Section */}
+        <View style={styles.profileHeader}>
+          <View style={styles.avatarWrapper}>
+            <Image
+              source={{
+                uri:
+                  avatar ||
+                  `https://avatar.iran.liara.run/public?username=${user?.username || "User"}`,
+              }}
+              style={styles.avatar}
+            />
+            <View style={styles.statusIndicator}>
+              {icon.camera({ size: 14, color: colors.white }, true)}
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Fields Section */}
-      <View style={styles.fieldsContainer}>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>PSEUDO</Text>
-          <ThemedTextInput
-            value={pseudo}
-            onChangeText={setPseudo}
-            placeholder="Votre pseudo"
-          />
+        {/* Fields Section */}
+        <View style={styles.fieldsContainer}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>PSEUDO</Text>
+            <ThemedTextInput
+              value={pseudo}
+              onChangeText={setPseudo}
+              placeholder="Votre pseudo"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>BIOGRAPHIE</Text>
+            <ThemedTextInput
+              value={bio}
+              onChangeText={setBio}
+              placeholder="Votre biographie"
+              multiline
+              numberOfLines={4}
+              style={{ height: 100 }}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>NOM</Text>
+            <ThemedTextInput
+              value={lastName}
+              onChangeText={setLastName}
+              placeholder="Votre nom"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>PRÉNOM</Text>
+            <ThemedTextInput
+              value={firstName}
+              onChangeText={setFirstName}
+              placeholder="Votre prénom"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>EMAIL</Text>
+            <ThemedTextInput
+              value={email}
+              onChangeText={setEmail}
+              placeholder="votre@email.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>MOT DE PASSE</Text>
+            <ThemedTextInput
+              value="*************"
+              editable={false}
+              placeholder="*************"
+            />
+          </View>
         </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>BIOGRAPHIE</Text>
-          <ThemedTextInput
-            value={bio}
-            onChangeText={setBio}
-            placeholder="Votre biographie"
-            multiline
-            numberOfLines={4}
-            style={{ height: 100 }}
+
+        {/* Settings Options Section using SettingsItem */}
+        <View style={styles.settingsContainer}>
+          <SettingsItem
+            type="bool"
+            icon="moon"
+            label="Mode Sombre"
+            value={isDarkMode}
+            onValueChange={setIsDarkMode}
           />
-        </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>NOM</Text>
-          <ThemedTextInput
-            value={lastName}
-            onChangeText={setLastName}
-            placeholder="Votre nom"
+
+          <SettingsItem
+            type="select"
+            icon="text"
+            label="Taille du texte"
+            selectedValue={textSize}
+            onPress={() =>
+              setTextSize(textSize === "Normal" ? "Large" : "Normal")
+            } // Mock logic
           />
-        </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>PRÉNOM</Text>
-          <ThemedTextInput
-            value={firstName}
-            onChangeText={setFirstName}
-            placeholder="Votre prénom"
+
+          <View style={styles.divider} />
+
+          <SettingsItem
+            type="link"
+            icon="help"
+            label="Centre d’aide / FAQ"
+            href="/help-center"
           />
-        </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>EMAIL</Text>
-          <ThemedTextInput
-            value={email}
-            onChangeText={setEmail}
-            placeholder="votre@email.com"
-            keyboardType="email-address"
-            autoCapitalize="none"
+
+          <SettingsItem
+            type="link"
+            icon="lightbulb"
+            label="Suggérer une idée"
+            href="/suggestion-box"
           />
-        </View>
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>MOT DE PASSE</Text>
-          <ThemedTextInput
-            value="*************"
-            editable={false}
-            placeholder="*************"
+
+          <View style={styles.divider} />
+
+          <SettingsItem
+            type="action"
+            icon="disconnect"
+            label="Se déconnecter"
+            isWarning
+            onPress={handleLogout}
           />
+
+          <SettingsItem
+            type="action"
+            icon="trashbin"
+            label="Supprimer mon compte"
+            isDestructive
+            onPress={() => {
+              setDeleteEmailConfirmation("");
+              setIsDeleteModalVisible(true);
+            }}
+          />
+
+          <View style={{ height: 80 }} />
         </View>
-      </View>
+      </ScrollView>
 
-      {/* Settings Options Section using SettingsItem */}
-      <View style={styles.settingsContainer}>
-        <SettingsItem
-          type="bool"
-          icon="moon"
-          label="Mode Sombre"
-          value={isDarkMode}
-          onValueChange={setIsDarkMode}
+      {/* Delete Account Modal */}
+      <Modal
+        visible={isDeleteModalVisible}
+        onClose={() => setIsDeleteModalVisible(false)}
+        title="Supprimer le compte"
+        type="danger"
+        primaryButton={{
+          label: "Supprimer",
+          onPress: handleDeleteAccount,
+          disabled: deleteEmailConfirmation !== email,
+          loading: isDeleting,
+        }}
+        secondaryButton={{
+          label: "Annuler",
+          onPress: () => setIsDeleteModalVisible(false),
+        }}
+      >
+        <Text
+          style={{
+            marginBottom: 10,
+            textAlign: "center",
+            color: colors.textDark,
+          }}
+        >
+          Cette action est irréversible. Toutes vos données seront perdues.
+        </Text>
+        <Text
+          style={{
+            marginBottom: 10,
+            textAlign: "center",
+            color: colors.textDark,
+            fontWeight: "bold",
+          }}
+        >
+          Veuillez taper votre email "{email}" pour confirmer :
+        </Text>
+        <ThemedTextInput
+          value={deleteEmailConfirmation}
+          onChangeText={setDeleteEmailConfirmation}
+          placeholder={email}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
-
-        <SettingsItem
-          type="select"
-          icon="text"
-          label="Taille du texte"
-          selectedValue={textSize}
-          onPress={() =>
-            setTextSize(textSize === "Normal" ? "Large" : "Normal")
-          } // Mock logic
-        />
-
-        <View style={styles.divider} />
-
-        <SettingsItem
-          type="link"
-          icon="help" // Mapping to 'link-outline' equivalent in icons.ts if available, using 'help' as approx or 'alerts'
-          label="Centre d’aide / FAQ"
-          href="/help-center"
-        />
-
-        <SettingsItem
-          type="link"
-          icon="lightbulb"
-          label="Suggérer une idée"
-          href="/suggestion-box"
-        />
-
-        <View style={styles.divider} />
-
-        <SettingsItem
-          type="action"
-          icon="disconnect"
-          label="Se déconnecter"
-          isWarning
-          onPress={handleLogout}
-        />
-
-        <SettingsItem
-          type="action"
-          icon="trashbin"
-          label="Supprimer mon compte"
-          isDestructive
-          onPress={() => console.log("Delete account")}
-        />
-
-        <View style={{ height: 80 }} />
-      </View>
-    </ScrollView>
+      </Modal>
+    </>
   );
 }
 
@@ -223,31 +299,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     right: 0,
-    backgroundColor: "#1A555B",
+    backgroundColor: colors.primary, // Using primary color from tokens
     borderRadius: 12,
-    borderWidth: 3,
-    borderColor: "#F5F5F5",
+    borderWidth: 2,
+    borderColor: colors.backgroundLight,
     alignItems: "center",
     justifyContent: "center",
-  },
-  statusInner: {
-    width: 15,
-    height: 10,
-    borderRadius: 2,
-    borderWidth: 1.5,
-    borderColor: "#F5F5F5",
-    position: "absolute",
-    top: 5,
-    left: 3,
-  },
-  statusDot: {
-    width: 5,
-    height: 5,
-    backgroundColor: "#F5F5F5",
-    borderRadius: 2.5,
-    position: "absolute",
-    bottom: 5,
-    right: 5,
   },
   fieldsContainer: {
     width: "100%",

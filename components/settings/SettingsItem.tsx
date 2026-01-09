@@ -36,7 +36,7 @@ export function SettingsItem({
   isDestructive,
   isWarning,
 }: SettingsItemProps) {
-  const IconComponent = icon[iconName];
+  const IconComponent = icon[iconName] as any;
 
   // Determine colors based on state
   let textColor = colors.textDark;

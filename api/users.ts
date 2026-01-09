@@ -28,4 +28,22 @@ export const UsersAPI = {
       throw error;
     }
   },
+
+  deleteAccount: async (id: string, token: string): Promise<void> => {
+    try {
+      const response = await fetch(`${CONFIG.API_URL}/users/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete account");
+      }
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      throw error;
+    }
+  },
 };
