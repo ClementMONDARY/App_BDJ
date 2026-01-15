@@ -13,15 +13,11 @@ interface SettingsItemProps {
   type: SettingsItemType;
   icon?: IconName;
   label: string;
-  // For 'bool'
   value?: boolean;
   onValueChange?: (value: boolean) => void;
-  // For 'select'
   selectedValue?: string;
-  // For 'link' / 'action'
   href?: string;
   onPress?: () => void;
-  // Appearance
   isDestructive?: boolean;
   isWarning?: boolean;
 }

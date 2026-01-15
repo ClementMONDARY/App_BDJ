@@ -383,8 +383,14 @@ export default function Settings() {
             label="Taille du texte"
             selectedValue={textSize}
             onPress={() =>
-              setTextSize(textSize === "Normal" ? "Large" : "Normal")
-            } // Mock logic
+              setTextSize(
+                textSize === "Petit"
+                  ? "Normal"
+                  : textSize === "Normal"
+                    ? "Large"
+                    : "Petit",
+              )
+            }
           />
 
           <View style={styles.divider} />

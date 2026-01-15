@@ -59,7 +59,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const colors = isDark ? darkColors : lightColors;
 
   if (!isReady) {
-    return null; // Or a splash screen
+    return null;
   }
 
   return (

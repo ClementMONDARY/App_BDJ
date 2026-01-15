@@ -37,7 +37,6 @@ export default function Header(props: any) {
           paddingHorizontal: 16,
           paddingTop: insets.top,
           backgroundColor: colors.black,
-          borderBottomWidth: 0,
           borderBottomRightRadius: 5,
           borderBottomLeftRadius: 5,
           borderBottomColor: colors.border,
@@ -46,7 +45,7 @@ export default function Header(props: any) {
       >
         {/* Left: Back Button or Empty View */}
         <View style={{ width: 40, alignItems: "flex-start" }}>
-          {back && (
+          {back ? (
             <Pressable
               onPress={() => navigation?.goBack?.()}
               style={({ pressed }) => ({
@@ -60,6 +59,12 @@ export default function Header(props: any) {
                 color={colors.iconInactive}
               />
             </Pressable>
+          ) : (
+            <Image
+              source={require("../assets/images/app-icon_light.png")}
+              style={{ width: 40, height: 40 }}
+              resizeMode="contain"
+            />
           )}
         </View>
 
