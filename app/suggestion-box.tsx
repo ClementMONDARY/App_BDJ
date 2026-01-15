@@ -1,11 +1,13 @@
-import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
+import { SuggestionsAPI, type Suggestion } from "@/api/suggestions";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { UnderlinedTitle } from "@/components/global/text/UnderlinedTitle";
 import { SuggestionItem } from "@/components/suggestion-box/SuggestionItem";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useSuggestions } from "@/hooks/useSuggestions";
-import { colors, fontSize, fonts, spacing } from "@/styles";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -24,6 +26,8 @@ export default function SuggestionBox() {
   const { user, getToken } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
 
   const [searchQuery, setSearchQuery] = useState("");
   const { suggestions, loading, refetch } = useSuggestions();
@@ -79,11 +83,12 @@ export default function SuggestionBox() {
       setNewTitle("");
       setNewContent("");
       refetch();
-    } catch (error: any) {
-      Alert.alert(
-        "Erreur",
-        error.message || "Impossible d'envoyer la suggestion",
-      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible d'envoyer la suggestion";
+      Alert.alert("Erreur", message);
     } finally {
       setSubmitting(false);
     }
@@ -133,7 +138,7 @@ export default function SuggestionBox() {
       <Stack.Screen options={{ title: "Boîte à idées" }} />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1, backgroundColor: colors.backgroundLight }}
+        style={{ flex: 1, backgroundColor: colors.background }} // Ensure background matches theme
         keyboardVerticalOffset={100}
       >
         <FlatList
@@ -167,30 +172,32 @@ export default function SuggestionBox() {
   );
 }
 
-const styles = StyleSheet.create({
-  headerContainer: {
-    marginBottom: 0,
-    gap: 30,
-  },
-  listContent: {
-    padding: spacing.paddingMain,
-  },
-  emptyText: {
-    textAlign: "center",
-    color: colors.iconInactive,
-    fontFamily: fonts.primary,
-    marginTop: 20,
-    marginBottom: 40,
-  },
-  formContainer: {
-    marginTop: spacing.md,
-    gap: 20,
-    paddingTop: 10,
-  },
-  formTitle: {
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primaryBold,
-    color: colors.black,
-    marginBottom: 5,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    headerContainer: {
+      marginBottom: 0,
+      gap: 30,
+    },
+    listContent: {
+      padding: spacing.paddingMain,
+      backgroundColor: colors.background,
+    },
+    emptyText: {
+      textAlign: "center",
+      color: colors.iconInactive,
+      fontFamily: fonts.primary,
+      marginTop: 20,
+      marginBottom: 40,
+    },
+    formContainer: {
+      marginTop: spacing.md,
+      gap: 20,
+      paddingTop: 10,
+    },
+    formTitle: {
+      fontSize: fontSize.m,
+      fontFamily: fonts.primaryBold,
+      color: colors.text,
+      marginBottom: 5,
+    },
+  });

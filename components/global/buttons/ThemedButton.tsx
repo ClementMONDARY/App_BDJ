@@ -1,4 +1,6 @@
-import { colors, fontSize, fonts, shadows } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
 import {
   ActivityIndicator,
   Pressable,
@@ -21,6 +23,9 @@ export function ThemedButton({
   disabled,
   ...props
 }: ThemedButtonProps) {
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -40,20 +45,21 @@ export function ThemedButton({
   );
 }
 
-const styles = StyleSheet.create({
-  button: {
-    width: "100%",
-    backgroundColor: colors.primary,
-    borderRadius: 10,
-    height: 48,
-    justifyContent: "center",
-    alignItems: "center",
-    ...shadows.light,
-  },
-  text: {
-    color: colors.white,
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primaryBold,
-    fontWeight: "600",
-  },
-});
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
+  StyleSheet.create({
+    button: {
+      width: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      height: 48,
+      justifyContent: "center",
+      alignItems: "center",
+      ...shadows.light,
+    },
+    text: {
+      color: colors.white,
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primaryBold,
+      fontWeight: "600",
+    },
+  });

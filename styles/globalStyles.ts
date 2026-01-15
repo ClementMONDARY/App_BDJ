@@ -1,160 +1,171 @@
+import { useTheme } from "@/contexts/ThemeContext";
 import { StyleSheet } from "react-native";
 import {
+  baseFontSize,
   borderRadius,
-  colors,
-  fontSize,
   fonts,
   shadows,
   spacing,
+  colors as staticColors, // Renamed to avoid confusion
+  type ThemeColors,
 } from "./constants";
 
-// Styles communs pour tous les composants
-export const commonStyles = StyleSheet.create({
-  mainContentContainer: {
-    width: "100%",
-    height: "100%",
-    padding: spacing.md,
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    display: "flex",
-    flex: 1,
-  },
-  // Conteneurs
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-    padding: spacing.lg,
-  },
+// Helper type for FontSizes
+type FontSizes = typeof baseFontSize;
 
-  containerCentered: {
-    flex: 1,
-    alignItems: "center",
-    backgroundColor: colors.background,
-    padding: spacing.lg,
-  },
+// Styles communs dynamiques
+export const createCommonStyles = (colors: ThemeColors, fontSizes: FontSizes) =>
+  StyleSheet.create({
+    mainContentContainer: {
+      width: "100%",
+      height: "100%",
+      padding: spacing.md,
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      display: "flex",
+      flex: 1,
+    },
+    // Conteneurs
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+      padding: spacing.lg,
+    },
 
-  containerLight: {
-    flex: 1,
-    padding: spacing.lg,
-  },
+    containerCentered: {
+      flex: 1,
+      alignItems: "center",
+      backgroundColor: colors.background,
+      padding: spacing.lg,
+    },
 
-  // Textes
-  title: {
-    fontSize: fontSize.xlarge,
-    fontWeight: "bold",
-    fontFamily: fonts.primaryBold,
-    marginBottom: spacing.sm,
-    color: colors.textDark,
-  },
+    containerLight: {
+      flex: 1,
+      padding: spacing.lg,
+    },
 
-  titleLarge: {
-    fontSize: fontSize.xxlarge,
-    fontWeight: "bold",
-    fontFamily: fonts.primaryBold,
-    marginBottom: spacing.sm,
-    textAlign: "center",
-    color: colors.textDark,
-  },
+    // Textes
+    title: {
+      fontSize: fontSizes.xl,
+      fontWeight: "bold",
+      fontFamily: fonts.primaryBold,
+      marginBottom: spacing.sm,
+      color: colors.text,
+    },
 
-  subtitle: {
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primary,
-    marginBottom: spacing.xl,
-    textAlign: "center",
-  },
+    titleLarge: {
+      fontSize: fontSizes["2xl"],
+      fontWeight: "bold",
+      fontFamily: fonts.primaryBold,
+      marginBottom: spacing.sm,
+      textAlign: "center",
+      color: colors.text,
+    },
 
-  // Boutons
-  button: {
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: borderRadius.medium,
-    alignItems: "center",
-  },
+    subtitle: {
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primary,
+      marginBottom: spacing.xl,
+      textAlign: "center",
+      color: colors.text,
+    },
 
-  buttonText: {
-    color: colors.white,
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primaryMedium,
-    fontWeight: "600",
-  },
+    // Boutons
+    button: {
+      backgroundColor: colors.primary,
+      padding: spacing.md,
+      borderRadius: borderRadius.m,
+      alignItems: "center",
+    },
 
-  // Conteneurs spéciaux
-  buttonContainer: {
-    width: "100%",
-    gap: spacing.md,
-  },
+    buttonText: {
+      color: colors.white,
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primaryMedium,
+      fontWeight: "600",
+    },
 
-  // Options/Listes
-  option: {
-    backgroundColor: colors.white,
-    padding: spacing.md,
-    borderRadius: borderRadius.medium,
-    ...shadows.light,
-  },
+    // Conteneurs spéciaux
+    buttonContainer: {
+      width: "100%",
+      gap: spacing.md,
+    },
 
-  optionText: {
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primaryMedium,
-    fontWeight: "500",
-    color: colors.textDark,
-  },
+    // Options/Listes
+    option: {
+      backgroundColor: colors.surface,
+      padding: spacing.md,
+      borderRadius: borderRadius.m,
+      ...shadows.light,
+    },
 
-  optionContainer: {
-    gap: spacing.sm,
-  },
+    optionText: {
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primaryMedium,
+      fontWeight: "500",
+      color: colors.text,
+    },
 
-  // Boutons spéciaux
-  backButton: {
-    backgroundColor: colors.primary,
-    padding: spacing.md,
-    borderRadius: borderRadius.medium,
-    alignItems: "center",
-    marginTop: spacing.xl,
-  },
+    optionContainer: {
+      gap: spacing.sm,
+    },
 
-  backButtonText: {
-    color: colors.white,
-    fontSize: fontSize.medium,
-    fontFamily: fonts.primaryMedium,
-    fontWeight: "600",
-  },
-});
+    // Boutons spéciaux
+    backButton: {
+      backgroundColor: colors.primary,
+      padding: spacing.md,
+      borderRadius: borderRadius.m,
+      alignItems: "center",
+      marginTop: spacing.xl,
+    },
 
-// Styles spécifiques par page
-export const pageStyles = {
+    backButtonText: {
+      color: colors.white,
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primaryMedium,
+      fontWeight: "600",
+    },
+  });
+
+// Styles spécifiques par page dynamiques
+export const createPageStyles = (
+  colors: ThemeColors,
+  fontSizes: FontSizes,
+  common: ReturnType<typeof createCommonStyles>,
+) => ({
   // Page d'accueil
   home: StyleSheet.create({
     container: {
-      ...commonStyles.containerCentered,
+      ...common.containerCentered,
     },
     title: {
-      ...commonStyles.titleLarge,
+      ...common.titleLarge,
     },
     subtitle: {
-      ...commonStyles.subtitle,
+      ...common.subtitle,
     },
     buttonContainer: {
-      ...commonStyles.buttonContainer,
+      ...common.buttonContainer,
     },
     button: {
-      ...commonStyles.button,
+      ...common.button,
     },
     buttonText: {
-      ...commonStyles.buttonText,
+      ...common.buttonText,
     },
   }),
 
   // Pages login et profile
   auth: StyleSheet.create({
     container: {
-      ...commonStyles.containerCentered,
+      ...common.containerCentered,
     },
     title: {
-      ...commonStyles.title,
+      ...common.title,
     },
     subtitle: {
-      ...commonStyles.subtitle,
+      ...common.subtitle,
       marginBottom: spacing.lg,
       textAlign: "left",
     },
@@ -163,31 +174,48 @@ export const pageStyles = {
   // Page settings
   settings: StyleSheet.create({
     container: {
-      ...commonStyles.containerLight,
+      ...common.containerLight,
     },
     title: {
-      ...commonStyles.title,
-      marginTop: spacing.xxxl,
+      ...common.title,
+      marginTop: spacing["3xl"],
     },
     subtitle: {
-      ...commonStyles.subtitle,
+      ...common.subtitle,
       textAlign: "left",
       marginBottom: spacing.xl,
     },
     optionContainer: {
-      ...commonStyles.optionContainer,
+      ...common.optionContainer,
     },
     option: {
-      ...commonStyles.option,
+      ...common.option,
     },
     optionText: {
-      ...commonStyles.optionText,
+      ...common.optionText,
     },
     backButton: {
-      ...commonStyles.backButton,
+      ...common.backButton,
     },
     backButtonText: {
-      ...commonStyles.backButtonText,
+      ...common.backButtonText,
     },
   }),
+});
+
+// Hook pour utiliser les styles globaux dynamiques
+export const useGlobalStyles = () => {
+  const { colors, fontSizes } = useTheme();
+  const common = createCommonStyles(colors, fontSizes);
+  const page = createPageStyles(colors, fontSizes, common);
+  return { common, page };
 };
+
+// @deprecated Use useGlobalStyles() instead
+export const commonStyles = createCommonStyles(staticColors, baseFontSize);
+// @deprecated Use useGlobalStyles() instead
+export const pageStyles = createPageStyles(
+  staticColors,
+  baseFontSize,
+  commonStyles,
+);

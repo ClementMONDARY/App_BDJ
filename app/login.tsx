@@ -1,5 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { colors } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fonts, type fontSize, type ThemeColors } from "@/styles";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -20,6 +22,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -34,8 +38,10 @@ export default function Login() {
       await signIn(email, password);
       // Navigate to home or previous screen
       router.replace("/");
-    } catch (error: any) {
-      Alert.alert("Erreur", error.message || "Échec de la connexion");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Échec de la connexion";
+      Alert.alert("Erreur", message);
     } finally {
       setLoading(false);
     }
@@ -44,7 +50,7 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: colors.backgroundLight }}
+      style={{ flex: 1, backgroundColor: colors.background }}
     >
       <View
         style={[
@@ -60,7 +66,7 @@ export default function Login() {
             <TextInput
               style={styles.input}
               placeholder="exemple@email.com"
-              placeholderTextColor={colors.iconInactive}
+              placeholderTextColor={colors.textSecondary}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -73,7 +79,7 @@ export default function Login() {
             <TextInput
               style={styles.input}
               placeholder="Votre mot de passe"
-              placeholderTextColor={colors.iconInactive}
+              placeholderTextColor={colors.textSecondary}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
@@ -89,7 +95,7 @@ export default function Login() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={colors.black} />
+              <ActivityIndicator color={colors.white} />
             ) : (
               <Text style={styles.buttonText}>Se connecter</Text>
             )}
@@ -109,64 +115,72 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 24,
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: colors.textDark,
-    marginBottom: 40,
-    textAlign: "center",
-  },
-  form: {
-    gap: 20,
-  },
-  inputGroup: {
-    gap: 8,
-  },
-  label: {
-    color: colors.textDark,
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  input: {
-    backgroundColor: colors.backgroundLight,
-    borderRadius: 12,
-    padding: 16,
-    color: colors.textDark,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: "#333",
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: colors.textLight,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  footerText: {
-    color: colors.iconInactive,
-    fontSize: 14,
-  },
-  link: {
-    color: colors.textDark,
-    fontSize: 14,
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-  },
-});
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      paddingHorizontal: 24,
+      justifyContent: "center",
+      backgroundColor: colors.background,
+    },
+    title: {
+      fontSize: fontSizes["2xl"],
+      fontWeight: "bold",
+      color: colors.text,
+      marginBottom: 40,
+      textAlign: "center",
+      fontFamily: fonts.primaryBold,
+    },
+    form: {
+      gap: 20,
+    },
+    inputGroup: {
+      gap: 8,
+    },
+    label: {
+      color: colors.text,
+      fontSize: fontSizes.m,
+      fontWeight: "500",
+      fontFamily: fonts.primary,
+    },
+    input: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 12,
+      padding: 16,
+      color: colors.text,
+      fontSize: fontSizes.m,
+      borderWidth: 1,
+      borderColor: colors.border,
+      fontFamily: fonts.primary,
+    },
+    button: {
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      padding: 16,
+      alignItems: "center",
+      marginTop: 10,
+    },
+    buttonText: {
+      color: colors.white,
+      fontSize: fontSizes.m,
+      fontWeight: "bold",
+      fontFamily: fonts.primaryBold,
+    },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "center",
+      marginTop: 20,
+    },
+    footerText: {
+      color: colors.textSecondary,
+      fontSize: fontSizes.s,
+      fontFamily: fonts.primary,
+    },
+    link: {
+      color: colors.text,
+      fontSize: fontSizes.s,
+      fontWeight: "bold",
+      textDecorationLine: "underline",
+      fontFamily: fonts.primaryBold,
+    },
+  });

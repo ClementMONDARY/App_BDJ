@@ -1,5 +1,6 @@
 import { icon } from "@/constants/icons";
-import { colors } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { colors, fonts } from "@/styles";
 import { useEffect } from "react";
 import { Pressable } from "react-native";
 import Animated, {
@@ -20,10 +21,11 @@ export function TabBarButton({
   onPress: () => void;
   onLongPress: () => void;
   isFocused: boolean;
-  routeName: string;
+  routeName: keyof typeof icon;
   color: string;
   label: string;
 }) {
+  const { fontSizes } = useTheme();
   const scale = useSharedValue(0);
   useEffect(() => {
     scale.value = withSpring(
@@ -75,6 +77,8 @@ export function TabBarButton({
           {
             color: colors.iconInactive,
             textAlign: "center",
+            fontFamily: fonts.primary,
+            fontSize: fontSizes.xs,
           },
           animatedTextStyle,
         ]}

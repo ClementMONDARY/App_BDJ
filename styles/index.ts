@@ -1,10 +1,12 @@
 // Exportation centralisée des styles
 export {
+  baseFontSize,
   borderRadius,
   colors,
-  fonts,
   fontSize,
+  fonts,
   shadows,
   spacing,
+  type ThemeColors,
 } from "./constants";
 export { commonStyles, pageStyles } from "./globalStyles";

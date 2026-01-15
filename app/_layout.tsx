@@ -9,8 +9,10 @@ import {
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -37,22 +39,38 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <StatusBar style="auto" />
-        <Stack
-          screenOptions={{
-            header: (props) => <Header {...props} />,
-          }}
-        >
-          <Stack.Screen
-            name="(tabs)"
-            options={{
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="+not-found" options={{ headerShown: false }} />
-        </Stack>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <ThemedRoot>
+            <StatusBar style="auto" />
+            <Stack
+              screenOptions={{
+                header: (props) => <Header {...props} />,
+              }}
+            >
+              <Stack.Screen
+                name="(tabs)"
+                options={{
+                  headerShown: false,
+                }}
+              />
+              <Stack.Screen
+                name="+not-found"
+                options={{ headerShown: false }}
+              />
+            </Stack>
+          </ThemedRoot>
+        </AuthProvider>
+      </ThemeProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function ThemedRoot({ children }: { children: React.ReactNode }) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {children}
+    </View>
   );
 }

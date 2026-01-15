@@ -2,7 +2,9 @@ import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
 import { UsersAPI } from "@/api/users";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
-import { colors, fontSize, fonts, shadows } from "@/styles";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -13,6 +15,8 @@ interface SuggestionItemProps {
 
 export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
   const { user, getToken } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemeStyles(createStyles);
   const [voting, setVoting] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
 
@@ -147,60 +151,61 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    backgroundColor: colors.white,
-    padding: 12,
-    borderRadius: 7,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
-    ...shadows.light,
-    gap: 10,
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  headerInfo: {
-    flex: 1,
-    gap: 3,
-  },
-  title: {
-    fontFamily: fonts.primaryBold,
-    fontSize: fontSize.medium,
-    color: colors.black,
-  },
-  date: {
-    fontFamily: fonts.primary,
-    fontSize: 9,
-    color: colors.iconInactive,
-  },
-  content: {
-    fontFamily: fonts.primary,
-    fontSize: fontSize.xs,
-    color: colors.black,
-    lineHeight: 18,
-  },
-  footer: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: 15,
-  },
-  voteButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  voteText: {
-    fontFamily: fonts.primaryBold,
-    fontSize: fontSize.medium,
-  },
-});
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
+  StyleSheet.create({
+    container: {
+      backgroundColor: colors.surface, // Use surface color
+      padding: 12,
+      borderRadius: 7,
+      marginBottom: 20,
+      borderWidth: 1,
+      borderColor: colors.border, // Use themed border
+      ...shadows.light,
+      gap: 10,
+    },
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 5,
+    },
+    avatar: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+    },
+    headerInfo: {
+      flex: 1,
+      gap: 3,
+    },
+    title: {
+      fontFamily: fonts.primaryBold,
+      fontSize: fontSizes.m,
+      color: colors.text, // Use themed text
+    },
+    date: {
+      fontFamily: fonts.primary,
+      fontSize: 9, // Keeping 9 as it's very small. Or fontSizes.xs - something? 9 is tiny.
+      color: colors.iconInactive, // Inactive icon color is good for secondary info
+    },
+    content: {
+      fontFamily: fonts.primary,
+      fontSize: fontSizes.xs,
+      color: colors.text, // Use themed text
+      lineHeight: 18,
+    },
+    footer: {
+      flexDirection: "row",
+      justifyContent: "flex-end",
+      alignItems: "center",
+      gap: 15,
+    },
+    voteButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+    },
+    voteText: {
+      fontFamily: fonts.primaryBold,
+      fontSize: fontSizes.m,
+    },
+  });
