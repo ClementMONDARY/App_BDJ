@@ -2,19 +2,20 @@ import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { type ThemeColors } from "@/styles";
-import { commonStyles } from "@/styles/globalStyles";
+import type { baseFontSize, ThemeColors } from "@/styles";
+import { useGlobalStyles } from "@/styles/globalStyles";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
   const styles = useThemeStyles(createStyles);
   const { colors } = useTheme();
+  const { common } = useGlobalStyles();
 
   return (
     <View
       style={[
-        commonStyles.mainContentContainer,
+        common.mainContentContainer,
         { backgroundColor: colors.background },
       ]}
     >
@@ -36,7 +37,7 @@ export default function HomeScreen() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -46,7 +47,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     text: {
       color: colors.text,
-      fontSize: 24,
+      fontSize: fontSizes.xl,
     },
     authContainer: {
       marginTop: 20,

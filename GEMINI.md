@@ -76,7 +76,64 @@ const styles = StyleSheet.create({
 });
 ```
 
-### 3. Authentication & State
+### 3. Theming (Dark Mode)
+- **Context**: Use `useTheme()` hook to access current theme colors (`colors`) and mode (`isDark`).
+- **Dynamic Styles**: Use `useThemeStyles` hook for styles that need to react to theme changes.
+- **Root Layout**: Ensure the root view uses `colors.background` to handle rounded corners properly.
+
+```tsx
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+
+export function MyComponent() {
+  const { colors, isDark } = useTheme();
+  // Creates styles that automatically update when theme changes
+  const styles = useThemeStyles((themeColors) => 
+    StyleSheet.create({
+      container: {
+        backgroundColor: themeColors.background,
+      },
+      text: {
+        color: themeColors.text,
+      }
+    })
+  );
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Themed Content</Text>
+    </View>
+  );
+  );
+}
+```
+
+### 4. Dynamic Text Sizing
+- **Context**: Access `fontSizes` from `useTheme()` for scalable text sizes (small/medium/large).
+- **Style Factory**: The `styleFactory` in `useThemeStyles` receives both `colors` and `fontSizes`.
+- **Global Styles**: Use `useGlobalStyles()` hook for standardized, responsive typography.
+
+```tsx
+import { useTheme } from "@/contexts/ThemeContext";
+import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { fonts } from "@/styles";
+
+export function MyTextComponent() {
+  const styles = useThemeStyles((colors, fontSizes) => 
+    StyleSheet.create({
+      text: {
+        color: colors.text,
+        fontSize: fontSizes.m, // Dynamic size
+        fontFamily: fonts.primary,
+      }
+    })
+  );
+
+  return <Text style={styles.text}>Resizable Text</Text>;
+}
+```
+
+### 5. Authentication & State
 - Use `useAuth()` hook to access user session and auth methods (`signIn`, `signOut`).
 - Secure storage keys should be managed within the Context, not exposed to components.
 

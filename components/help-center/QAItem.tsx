@@ -1,5 +1,5 @@
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { fonts, spacing, type fontSize, type ThemeColors } from "@/styles";
 import { StyleSheet, Text, View } from "react-native";
 
 interface QAItemProps {
@@ -18,7 +18,7 @@ export function QAItem({ question, answer }: QAItemProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     container: {
       width: "100%",
@@ -28,13 +28,13 @@ const createStyles = (colors: ThemeColors) =>
     },
     question: {
       color: colors.text,
-      fontSize: fontSize.m,
+      fontSize: fontSizes.m,
       fontFamily: fonts.primaryBold,
       textAlign: "left",
     },
     answer: {
       color: colors.textSecondary, // Secondary text for answer might be better
-      fontSize: fontSize.xs,
+      fontSize: fontSizes.xs,
       fontFamily: fonts.primary,
       lineHeight: 18,
       paddingHorizontal: spacing.md,

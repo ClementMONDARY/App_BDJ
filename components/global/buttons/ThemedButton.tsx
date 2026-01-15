@@ -1,12 +1,12 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, shadows, type ThemeColors } from "@/styles";
+import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
 import {
   ActivityIndicator,
   Pressable,
+  type PressableProps,
   StyleSheet,
   Text,
-  type PressableProps,
   type ViewStyle,
 } from "react-native";
 
@@ -45,7 +45,7 @@ export function ThemedButton({
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     button: {
       width: "100%",
@@ -58,7 +58,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     text: {
       color: colors.white,
-      fontSize: fontSize.m,
+      fontSize: fontSizes.m,
       fontFamily: fonts.primaryBold,
       fontWeight: "600",
     },

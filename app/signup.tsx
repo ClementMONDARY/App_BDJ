@@ -1,7 +1,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fonts, type ThemeColors } from "@/styles";
+import { fonts, type fontSize, type ThemeColors } from "@/styles";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -180,7 +180,7 @@ export default function Signup() {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     inputRow: {
       flexDirection: "row",
@@ -197,7 +197,7 @@ const createStyles = (colors: ThemeColors) =>
       backgroundColor: colors.background,
     },
     title: {
-      fontSize: 32,
+      fontSize: fontSizes["2xl"],
       fontWeight: "bold",
       color: colors.text,
       marginBottom: 40,
@@ -212,7 +212,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     label: {
       color: colors.text,
-      fontSize: 16,
+      fontSize: fontSizes.m,
       fontWeight: "500",
       fontFamily: fonts.primary,
     },
@@ -221,7 +221,7 @@ const createStyles = (colors: ThemeColors) =>
       borderRadius: 12,
       padding: 16,
       color: colors.text,
-      fontSize: 16,
+      fontSize: fontSizes.m,
       borderWidth: 1,
       borderColor: colors.border,
       fontFamily: fonts.primary,
@@ -235,7 +235,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     buttonText: {
       color: colors.white,
-      fontSize: 16,
+      fontSize: fontSizes.m,
       fontWeight: "bold",
       fontFamily: fonts.primaryBold,
     },
@@ -246,12 +246,12 @@ const createStyles = (colors: ThemeColors) =>
     },
     footerText: {
       color: colors.textSecondary,
-      fontSize: 14,
+      fontSize: fontSizes.s,
       fontFamily: fonts.primary,
     },
     link: {
       color: colors.text,
-      fontSize: 14,
+      fontSize: fontSizes.s,
       fontWeight: "bold",
       textDecorationLine: "underline",
       fontFamily: fonts.primaryBold,

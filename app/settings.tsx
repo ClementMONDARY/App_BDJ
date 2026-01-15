@@ -23,7 +23,7 @@ import {
 
 export default function Settings() {
   const { user, signOut, getToken } = useAuth();
-  const { colors, setTheme, isDark } = useTheme();
+  const { colors, setTheme, isDark, textSize, setTextSize } = useTheme();
 
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
@@ -52,8 +52,6 @@ export default function Settings() {
     firstName !== initialUserData.firstName ||
     lastName !== initialUserData.lastName ||
     email !== initialUserData.email;
-
-  const [textSize, setTextSize] = useState("Normal");
 
   // Account Deletion State
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
@@ -381,14 +379,20 @@ export default function Settings() {
             type="select"
             icon="text"
             label="Taille du texte"
-            selectedValue={textSize}
+            selectedValue={
+              textSize === "medium"
+                ? "Normal"
+                : textSize === "small"
+                  ? "Petit"
+                  : "Grand"
+            }
             onPress={() =>
               setTextSize(
-                textSize === "Petit"
-                  ? "Normal"
-                  : textSize === "Normal"
-                    ? "Large"
-                    : "Petit",
+                textSize === "small"
+                  ? "medium"
+                  : textSize === "medium"
+                    ? "large"
+                    : "small",
               )
             }
           />

@@ -1,10 +1,10 @@
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { fonts, type fontSize, spacing, type ThemeColors } from "@/styles";
 import {
+  type StyleProp,
   StyleSheet,
   Text,
   View,
-  type StyleProp,
   type ViewStyle,
 } from "react-native";
 
@@ -24,7 +24,7 @@ export function UnderlinedTitle({ title, style }: UnderlinedTitleProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     container: {
       width: "100%",
@@ -35,7 +35,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     title: {
       color: colors.text,
-      fontSize: fontSize.l + 2,
+      fontSize: fontSizes.l + 2,
       fontFamily: fonts.primaryBold,
       paddingLeft: spacing.sm,
     },

@@ -1,10 +1,10 @@
-import { SuggestionsAPI, type Suggestion } from "@/api/suggestions";
+import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
 import { UsersAPI } from "@/api/users";
 import { icon } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, shadows, type ThemeColors } from "@/styles";
+import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -151,7 +151,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.surface, // Use surface color
@@ -179,17 +179,17 @@ const createStyles = (colors: ThemeColors) =>
     },
     title: {
       fontFamily: fonts.primaryBold,
-      fontSize: fontSize.m,
+      fontSize: fontSizes.m,
       color: colors.text, // Use themed text
     },
     date: {
       fontFamily: fonts.primary,
-      fontSize: 9,
+      fontSize: 9, // Keeping 9 as it's very small. Or fontSizes.xs - something? 9 is tiny.
       color: colors.iconInactive, // Inactive icon color is good for secondary info
     },
     content: {
       fontFamily: fonts.primary,
-      fontSize: fontSize.xs,
+      fontSize: fontSizes.xs,
       color: colors.text, // Use themed text
       lineHeight: 18,
     },
@@ -206,6 +206,6 @@ const createStyles = (colors: ThemeColors) =>
     },
     voteText: {
       fontFamily: fonts.primaryBold,
-      fontSize: fontSize.m,
+      fontSize: fontSizes.m,
     },
   });

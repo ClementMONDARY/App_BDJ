@@ -1,6 +1,6 @@
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import type { ThemeColors } from "@/styles/constants";
+import type { baseFontSize, ThemeColors } from "@/styles/constants";
 import type React from "react";
 import {
   Modal as RNModal,
@@ -106,7 +106,7 @@ export function Modal({
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
   StyleSheet.create({
     overlay: {
       flex: 1,
@@ -134,7 +134,7 @@ const createStyles = (colors: ThemeColors) =>
       padding: 20,
     },
     title: {
-      fontSize: 20,
+      fontSize: fontSizes.xl, // 20 is close to xl (24) or l (18). 20 is custom. Let's use xl or scale it. 20/16 * m? I'll use xl.
       fontWeight: "bold",
       marginBottom: 15,
       textAlign: "center",
@@ -158,7 +158,7 @@ const createStyles = (colors: ThemeColors) =>
     primaryButtonText: {
       color: colors.white, // Text on button usually white
       fontWeight: "bold",
-      fontSize: 16,
+      fontSize: fontSizes.m,
       fontFamily: "Roboto Mono",
     },
     secondaryButton: {
@@ -173,7 +173,7 @@ const createStyles = (colors: ThemeColors) =>
     secondaryButtonText: {
       color: colors.text,
       fontWeight: "bold",
-      fontSize: 16,
+      fontSize: fontSizes.m,
       fontFamily: "Roboto Mono",
     },
   });

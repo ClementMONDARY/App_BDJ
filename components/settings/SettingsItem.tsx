@@ -1,7 +1,7 @@
 import { icon } from "@/constants/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, type ThemeColors } from "@/styles";
+import { fonts, type fontSize, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
@@ -123,7 +123,7 @@ export function SettingsItem({
   return <View>{Content}</View>;
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
@@ -144,7 +144,7 @@ const createStyles = (colors: ThemeColors) =>
       justifyContent: "center",
     },
     label: {
-      fontSize: fontSize.m,
+      fontSize: fontSizes.m,
       fontFamily: fonts.primaryBold,
     },
     dropdownMock: {

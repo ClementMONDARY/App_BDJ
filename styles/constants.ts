@@ -108,7 +108,7 @@ export const fonts = {
 };
 
 // Tailles de police
-export const fontSize = {
+export const baseFontSize = {
   xs: 12,
   s: 14,
   m: 16,
@@ -116,6 +116,9 @@ export const fontSize = {
   xl: 24,
   "2xl": 28,
 };
+
+// @deprecated Use fontSizes from useTheme() instead for dynamic sizing
+export const fontSize = baseFontSize;
 
 // Rayons de bordure
 export const borderRadius = {

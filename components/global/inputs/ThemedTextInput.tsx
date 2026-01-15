@@ -2,8 +2,8 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import {
   borderRadius,
-  fontSize,
   fonts,
+  type fontSize,
   shadows,
   type ThemeColors,
 } from "@/styles";
@@ -11,8 +11,8 @@ import { forwardRef } from "react";
 import {
   StyleSheet,
   TextInput,
-  View,
   type TextInputProps,
+  View,
   type ViewStyle,
 } from "react-native";
 
@@ -38,7 +38,7 @@ export const ThemedTextInput = forwardRef<TextInput, ThemedTextInputProps>(
   },
 );
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
   StyleSheet.create({
     container: {
       backgroundColor: colors.inputBackground,
@@ -52,7 +52,7 @@ const createStyles = (colors: ThemeColors) =>
     input: {
       padding: 12,
       fontFamily: fonts.primary,
-      fontSize: fontSize.xs,
+      fontSize: fontSizes.xs,
       color: colors.text,
     },
     textArea: {

@@ -1,5 +1,6 @@
 // Exportation centralisée des styles
 export {
+  baseFontSize,
   borderRadius,
   colors,
   fontSize,

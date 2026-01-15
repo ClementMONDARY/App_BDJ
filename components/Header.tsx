@@ -9,7 +9,7 @@ import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function Header(props: any) {
-  const { colors } = useTheme();
+  const { colors, fontSizes } = useTheme();
   const { navigation, route, options, back } = props;
   const title = options?.title ?? (route?.name ? String(route.name) : "Titre");
   const insets = useSafeAreaInsets();
@@ -74,7 +74,7 @@ export default function Header(props: any) {
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{
-              fontSize: 18,
+              fontSize: fontSizes.l,
               fontWeight: "600",
               color: colors.textWhite,
               textAlign: "center",
