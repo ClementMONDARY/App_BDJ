@@ -2,8 +2,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, type ThemeColors } from "@/styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -16,42 +18,60 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { z } from "zod";
+
+const signupSchema = z
+  .object({
+    firstname: z.string().min(1, "Le prénom est requis"),
+    lastname: z.string().min(1, "Le nom est requis"),
+    username: z.string().min(1, "Le nom d'utilisateur est requis"),
+    email: z.string().email("Email invalide").min(1, "L'email est requis"),
+    password: z
+      .string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+    confirmPassword: z.string().min(1, "La confirmation est requise"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
+
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [loading, setLoading] = useState(false);
   const { signUp } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(false);
 
-  const handleSignup = async () => {
-    if (
-      !email ||
-      !password ||
-      !confirmPassword ||
-      !username ||
-      !firstname ||
-      !lastname
-    ) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      firstname: "",
+      lastname: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
 
-    if (password !== confirmPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
-      return;
-    }
-
+  const onSubmit = async (data: SignupFormValues) => {
     try {
       setLoading(true);
-      await signUp(email, password, username, firstname, lastname);
+      await signUp(
+        data.email,
+        data.password,
+        data.username,
+        data.firstname,
+        data.lastname,
+      );
       Alert.alert("Succès", "Compte créé avec succès", [
         { text: "OK", onPress: () => router.replace("/") },
       ]);
@@ -81,73 +101,141 @@ export default function Signup() {
           <View style={styles.inputRow}>
             <View style={[styles.inputGroup, styles.inputHalfWidth]}>
               <Text style={styles.label}>Prénom</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Votre prénom"
-                placeholderTextColor={colors.textSecondary}
-                value={firstname}
-                onChangeText={setFirstname}
+              <Controller
+                control={control}
+                name="firstname"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.firstname && styles.inputError,
+                    ]}
+                    placeholder="Votre prénom"
+                    placeholderTextColor={colors.textSecondary}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                  />
+                )}
               />
+              {errors.firstname && (
+                <Text style={styles.errorText}>{errors.firstname.message}</Text>
+              )}
             </View>
             <View style={[styles.inputGroup, styles.inputHalfWidth]}>
               <Text style={styles.label}>Nom</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Votre nom"
-                placeholderTextColor={colors.textSecondary}
-                value={lastname}
-                onChangeText={setLastname}
+              <Controller
+                control={control}
+                name="lastname"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[styles.input, errors.lastname && styles.inputError]}
+                    placeholder="Votre nom"
+                    placeholderTextColor={colors.textSecondary}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                  />
+                )}
               />
+              {errors.lastname && (
+                <Text style={styles.errorText}>{errors.lastname.message}</Text>
+              )}
             </View>
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Nom d'utilisateur</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Votre nom d'utilisateur"
-              placeholderTextColor={colors.textSecondary}
-              value={username}
-              onChangeText={setUsername}
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="username"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, errors.username && styles.inputError]}
+                  placeholder="Votre nom d'utilisateur"
+                  placeholderTextColor={colors.textSecondary}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                />
+              )}
             />
+            {errors.username && (
+              <Text style={styles.errorText}>{errors.username.message}</Text>
+            )}
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="exemple@email.com"
-              placeholderTextColor={colors.textSecondary}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  placeholder="exemple@email.com"
+                  placeholderTextColor={colors.textSecondary}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              )}
             />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email.message}</Text>
+            )}
           </View>
 
           <View style={styles.inputRow}>
             <View style={[styles.inputGroup, styles.inputHalfWidth]}>
               <Text style={styles.label}>Mot de passe</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Votre mot de passe"
-                placeholderTextColor={colors.textSecondary}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[styles.input, errors.password && styles.inputError]}
+                    placeholder="Votre mot de passe"
+                    placeholderTextColor={colors.textSecondary}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    secureTextEntry
+                  />
+                )}
               />
+              {errors.password && (
+                <Text style={styles.errorText}>{errors.password.message}</Text>
+              )}
             </View>
             <View style={[styles.inputGroup, styles.inputHalfWidth]}>
               <Text style={styles.label}>Confirmer le mot de passe</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Confirmez votre mot de passe"
-                placeholderTextColor={colors.textSecondary}
-                value={confirmPassword}
-                onChangeText={setConfirmPassword}
-                secureTextEntry
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field: { onChange, onBlur, value } }) => (
+                  <TextInput
+                    style={[
+                      styles.input,
+                      errors.confirmPassword && styles.inputError,
+                    ]}
+                    placeholder="Confirmez"
+                    placeholderTextColor={colors.textSecondary}
+                    value={value}
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    secureTextEntry
+                  />
+                )}
               />
+              {errors.confirmPassword && (
+                <Text style={styles.errorText}>
+                  {errors.confirmPassword.message}
+                </Text>
+              )}
             </View>
           </View>
 
@@ -156,7 +244,7 @@ export default function Signup() {
               styles.button,
               { opacity: pressed || loading ? 0.7 : 1 },
             ]}
-            onPress={handleSignup}
+            onPress={handleSubmit(onSubmit)}
             disabled={loading}
           >
             {loading ? (
@@ -224,6 +312,14 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
       fontSize: fontSizes.m,
       borderWidth: 1,
       borderColor: colors.border,
+      fontFamily: fonts.primary,
+    },
+    inputError: {
+      borderColor: colors.error || "red",
+    },
+    errorText: {
+      color: colors.error || "red",
+      fontSize: fontSizes.xs,
       fontFamily: fonts.primary,
     },
     button: {

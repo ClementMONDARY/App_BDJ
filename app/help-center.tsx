@@ -8,8 +8,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -21,6 +23,13 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { z } from "zod";
+
+const questionSchema = z.object({
+  question: z.string().min(1, "La question est requise"),
+});
+
+type QuestionFormValues = z.infer<typeof questionSchema>;
 
 export default function HelpCenter() {
   const { user, getToken } = useAuth();
@@ -33,8 +42,19 @@ export default function HelpCenter() {
   const { questions, loading, refetch } = useHelpCenterQuestions();
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
 
-  const [newQuestion, setNewQuestion] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<QuestionFormValues>({
+    resolver: zodResolver(questionSchema),
+    defaultValues: {
+      question: "",
+    },
+  });
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -50,7 +70,7 @@ export default function HelpCenter() {
     }
   }, [searchQuery, questions]);
 
-  const handleSubmit = async () => {
+  const onSubmit = async (data: QuestionFormValues) => {
     if (!user) {
       Alert.alert(
         "Connexion requise",
@@ -63,21 +83,15 @@ export default function HelpCenter() {
       return;
     }
 
-    if (!newQuestion.trim()) {
-      Alert.alert("Erreur", "Veuillez entrer une question.");
-      return;
-    }
-
     try {
       setSubmitting(true);
       const token = await getToken();
       if (!token) throw new Error("Impossible de récupérer le token");
 
-      await HelpCenterAPI.submitQuestion(newQuestion, token);
+      await HelpCenterAPI.submitQuestion(data.question, token);
 
       Alert.alert("Succès", "Votre question a été envoyée !");
-      setNewQuestion("");
-      refetch();
+      reset();
       refetch();
     } catch (error) {
       const message =
@@ -107,16 +121,27 @@ export default function HelpCenter() {
     <View style={styles.formContainer}>
       <UnderlinedTitle title="UNE QUESTION ?" />
 
-      <ThemedTextInput
-        placeholder="Votre question..."
-        multiline
-        value={newQuestion}
-        onChangeText={setNewQuestion}
-      />
+      <View style={{ gap: 5 }}>
+        <Controller
+          control={control}
+          name="question"
+          render={({ field: { onChange, value } }) => (
+            <ThemedTextInput
+              placeholder="Votre question..."
+              multiline
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
+        />
+        {errors.question && (
+          <Text style={styles.errorText}>{errors.question.message}</Text>
+        )}
+      </View>
 
       <ThemedButton
         title="Envoyer"
-        onPress={handleSubmit}
+        onPress={handleSubmit(onSubmit)}
         loading={submitting}
       />
     </View>
@@ -186,5 +211,11 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: fonts.primaryBold,
       color: colors.text,
       marginBottom: 20,
+    },
+    errorText: {
+      color: colors.error || "red",
+      fontSize: 12,
+      fontFamily: fonts.primary,
+      marginLeft: 5,
     },
   });

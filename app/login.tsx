@@ -2,8 +2,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, type ThemeColors } from "@/styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -16,26 +18,39 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Email invalide").min(1, "L'email est requis"),
+  password: z.string().min(1, "Le mot de passe est requis"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const onSubmit = async (data: LoginFormValues) => {
     try {
       setLoading(true);
-      await signIn(email, password);
+      await signIn(data.email, data.password);
       // Navigate to home or previous screen
       router.replace("/");
     } catch (error) {
@@ -63,27 +78,47 @@ export default function Login() {
         <View style={styles.form}>
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="exemple@email.com"
-              placeholderTextColor={colors.textSecondary}
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, errors.email && styles.inputError]}
+                  placeholder="exemple@email.com"
+                  placeholderTextColor={colors.textSecondary}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  autoCapitalize="none"
+                  keyboardType="email-address"
+                />
+              )}
             />
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email.message}</Text>
+            )}
           </View>
 
           <View style={styles.inputGroup}>
             <Text style={styles.label}>Mot de passe</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Votre mot de passe"
-              placeholderTextColor={colors.textSecondary}
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <TextInput
+                  style={[styles.input, errors.password && styles.inputError]}
+                  placeholder="Votre mot de passe"
+                  placeholderTextColor={colors.textSecondary}
+                  value={value}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  secureTextEntry
+                />
+              )}
             />
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password.message}</Text>
+            )}
           </View>
 
           <Pressable
@@ -91,7 +126,7 @@ export default function Login() {
               styles.button,
               { opacity: pressed || loading ? 0.7 : 1 },
             ]}
-            onPress={handleLogin}
+            onPress={handleSubmit(onSubmit)}
             disabled={loading}
           >
             {loading ? (
@@ -151,6 +186,14 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
       fontSize: fontSizes.m,
       borderWidth: 1,
       borderColor: colors.border,
+      fontFamily: fonts.primary,
+    },
+    inputError: {
+      borderColor: colors.error || "red",
+    },
+    errorText: {
+      color: colors.error || "red",
+      fontSize: fontSizes.s,
       fontFamily: fonts.primary,
     },
     button: {

@@ -8,8 +8,10 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   ActivityIndicator,
   Alert,
@@ -21,6 +23,14 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { z } from "zod";
+
+const suggestionSchema = z.object({
+  title: z.string().min(1, "Le titre est requis"),
+  content: z.string().min(1, "Le contenu est requis"),
+});
+
+type SuggestionFormValues = z.infer<typeof suggestionSchema>;
 
 export default function SuggestionBox() {
   const { user, getToken } = useAuth();
@@ -35,10 +45,20 @@ export default function SuggestionBox() {
     [],
   );
 
-  // Form State
-  const [newTitle, setNewTitle] = useState("");
-  const [newContent, setNewContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<SuggestionFormValues>({
+    resolver: zodResolver(suggestionSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+    },
+  });
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -54,7 +74,7 @@ export default function SuggestionBox() {
     }
   }, [searchQuery, suggestions]);
 
-  const handleSubmit = async () => {
+  const onSubmit = async (data: SuggestionFormValues) => {
     if (!user) {
       Alert.alert(
         "Connexion requise",
@@ -67,21 +87,15 @@ export default function SuggestionBox() {
       return;
     }
 
-    if (!newTitle.trim() || !newContent.trim()) {
-      Alert.alert("Erreur", "Veuillez remplir le titre et le contenu.");
-      return;
-    }
-
     try {
       setSubmitting(true);
       const token = await getToken();
       if (!token) throw new Error("Token manquant");
 
-      await SuggestionsAPI.submitSuggestion(newTitle, newContent, token);
+      await SuggestionsAPI.submitSuggestion(data.title, data.content, token);
 
       Alert.alert("Succès", "Votre suggestion a été envoyée !");
-      setNewTitle("");
-      setNewContent("");
+      reset();
       refetch();
     } catch (error) {
       const message =
@@ -112,22 +126,44 @@ export default function SuggestionBox() {
     <View style={styles.formContainer}>
       <UnderlinedTitle title="UNE IDÉE EN TETE ?" />
 
-      <ThemedTextInput
-        placeholder="Votre titre..."
-        value={newTitle}
-        onChangeText={setNewTitle}
-      />
+      <View style={styles.inputGroup}>
+        <Controller
+          control={control}
+          name="title"
+          render={({ field: { onChange, value } }) => (
+            <ThemedTextInput
+              placeholder="Votre titre..."
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
+        />
+        {errors.title && (
+          <Text style={styles.errorText}>{errors.title.message}</Text>
+        )}
+      </View>
 
-      <ThemedTextInput
-        placeholder="Votre contenu..."
-        multiline
-        value={newContent}
-        onChangeText={setNewContent}
-      />
+      <View style={styles.inputGroup}>
+        <Controller
+          control={control}
+          name="content"
+          render={({ field: { onChange, value } }) => (
+            <ThemedTextInput
+              placeholder="Votre contenu..."
+              multiline
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
+        />
+        {errors.content && (
+          <Text style={styles.errorText}>{errors.content.message}</Text>
+        )}
+      </View>
 
       <ThemedButton
         title="Envoyer"
-        onPress={handleSubmit}
+        onPress={handleSubmit(onSubmit)}
         loading={submitting}
       />
     </View>
@@ -199,5 +235,14 @@ const createStyles = (colors: ThemeColors) =>
       fontFamily: fonts.primaryBold,
       color: colors.text,
       marginBottom: 5,
+    },
+    inputGroup: {
+      gap: 5,
+    },
+    errorText: {
+      color: colors.error || "red",
+      fontSize: 12,
+      fontFamily: fonts.primary,
+      marginLeft: 5,
     },
   });

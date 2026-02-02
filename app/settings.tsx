@@ -9,9 +9,11 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import {
   Image,
   ScrollView,
@@ -20,6 +22,37 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { z } from "zod";
+
+// Zod Schemas
+const profileSchema = z.object({
+  username: z.string().min(1, "Le pseudo est requis"),
+  bio: z.string().optional(),
+  firstname: z.string().optional(),
+  lastname: z.string().optional(),
+  email: z.string().email("Email invalide").min(1, "L'email est requis"),
+});
+
+const passwordSchema = z
+  .object({
+    currentPassword: z.string().min(1, "Le mot de passe actuel est requis"),
+    newPassword: z
+      .string()
+      .min(8, "Le mot de passe doit contenir au moins 8 caractères"),
+    confirmPassword: z.string().min(1, "La confirmation est requise"),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Les mots de passe ne correspondent pas",
+    path: ["confirmPassword"],
+  });
+
+const deleteAccountSchema = z.object({
+  emailConfirmation: z.string().email("Email invalide"),
+});
+
+type ProfileFormValues = z.infer<typeof profileSchema>;
+type PasswordFormValues = z.infer<typeof passwordSchema>;
+type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
 
 export default function Settings() {
   const { user, signOut, getToken } = useAuth();
@@ -29,41 +62,58 @@ export default function Settings() {
   const router = useRouter();
 
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [pseudo, setPseudo] = useState(user?.username || "");
-  const [bio, setBio] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState(user?.email || "");
-
-  const [initialUserData, setInitialUserData] = useState({
-    pseudo: user?.username || "",
-    bio: "",
-    firstName: "",
-    lastName: "",
-    email: user?.email || "",
-  });
-
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Check if there are changes
-  const hasChanges =
-    pseudo !== initialUserData.pseudo ||
-    bio !== initialUserData.bio ||
-    firstName !== initialUserData.firstName ||
-    lastName !== initialUserData.lastName ||
-    email !== initialUserData.email;
+  // Profile Form
+  const {
+    control: profileControl,
+    handleSubmit: handleProfileSubmit,
+    reset: resetProfile,
+    formState: { isDirty: isProfileDirty },
+  } = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      username: user?.username || "",
+      bio: "",
+      firstname: "",
+      lastname: "",
+      email: user?.email || "",
+    },
+  });
 
-  // Account Deletion State
-  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [deleteEmailConfirmation, setDeleteEmailConfirmation] = useState("");
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  // Password Update State
+  // Password Form
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const {
+    control: passwordControl,
+    handleSubmit: handlePasswordSubmit,
+    reset: resetPassword,
+    formState: { isValid: isPasswordValid },
+  } = useForm<PasswordFormValues>({
+    resolver: zodResolver(passwordSchema),
+    mode: "onChange",
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
+
+  // Account Deletion Form
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const {
+    control: deleteControl,
+    handleSubmit: handleDeleteSubmit,
+    watch: watchDelete,
+    reset: resetDelete,
+  } = useForm<DeleteAccountFormValues>({
+    resolver: zodResolver(deleteAccountSchema),
+    defaultValues: {
+      emailConfirmation: "",
+    },
+  });
+  const deleteEmailValue = watchDelete("emailConfirmation");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,19 +129,12 @@ export default function Settings() {
 
           if (response.ok) {
             const data = await response.json();
-            setPseudo(data.username || "");
-            setEmail(data.email || "");
             setAvatar(data.avatar);
-            setBio(data.bio || "");
-            setFirstName(data.firstname || "");
-            setLastName(data.lastname || "");
-
-            // Set initial data for comparison
-            setInitialUserData({
-              pseudo: data.username || "",
+            resetProfile({
+              username: data.username || "",
               bio: data.bio || "",
-              firstName: data.firstname || "",
-              lastName: data.lastname || "",
+              firstname: data.firstname || "",
+              lastname: data.lastname || "",
               email: data.email || "",
             });
           }
@@ -102,35 +145,34 @@ export default function Settings() {
     };
 
     if (user) {
-      setPseudo(user.username || "");
-      setEmail(user.email || "");
+      resetProfile({
+        username: user.username || "",
+        email: user.email || "",
+        bio: "",
+        firstname: "",
+        lastname: "",
+      });
       fetchUserData();
     }
-  }, [user, getToken]);
+  }, [user, getToken, resetProfile]);
 
-  const handleSave = async () => {
-    if (!user || !hasChanges) return;
+  const onProfileSubmit = async (data: ProfileFormValues) => {
+    if (!user) return;
 
     setIsUpdating(true);
     try {
       const token = await getToken();
       if (token) {
         await UsersAPI.updateUser(user.id.toString(), token, {
-          username: pseudo,
-          bio: bio,
-          firstname: firstName,
-          lastname: lastName,
-          email: email,
+          username: data.username,
+          bio: data.bio,
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
         });
 
-        // Update initial data to current values
-        setInitialUserData({
-          pseudo,
-          bio,
-          firstName,
-          lastName,
-          email,
-        });
+        // Update default values to new values so isDirty resets
+        resetProfile(data);
 
         alert("Profil mis à jour avec succès !");
       }
@@ -142,14 +184,12 @@ export default function Settings() {
     }
   };
 
-  const handlePasswordUpdate = async () => {
+  const onPasswordSubmit = async (data: PasswordFormValues) => {
     if (!user) return;
-    if (newPassword !== confirmPassword) {
+
+    // Additional check if needed, though zod handles it
+    if (data.newPassword !== data.confirmPassword) {
       alert("Les nouveaux mots de passe ne correspondent pas");
-      return;
-    }
-    if (newPassword.length < 8) {
-      alert("Le mot de passe doit contenir au moins 8 caractères");
       return;
     }
 
@@ -158,10 +198,11 @@ export default function Settings() {
       const token = await getToken();
       if (token) {
         await UsersAPI.updateUser(user.id.toString(), token, {
-          password: newPassword,
+          password: data.newPassword,
         });
         alert("Mot de passe mis à jour avec succès");
         setIsPasswordModalVisible(false);
+        resetPassword();
       }
     } catch (error) {
       console.error("Failed to update password", error);
@@ -220,7 +261,7 @@ export default function Settings() {
     }
   };
 
-  const handleDeleteAccount = async () => {
+  const onDeleteSubmit = async () => {
     if (!user) return;
     setIsDeleting(true);
     try {
@@ -295,56 +336,84 @@ export default function Settings() {
             <View style={styles.fieldsContainer}>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>PSEUDO</Text>
-                <ThemedTextInput
-                  value={pseudo}
-                  onChangeText={setPseudo}
-                  placeholder="Votre pseudo"
+                <Controller
+                  control={profileControl}
+                  name="username"
+                  render={({ field: { onChange, value } }) => (
+                    <ThemedTextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Votre pseudo"
+                    />
+                  )}
                 />
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>BIOGRAPHIE</Text>
-                <ThemedTextInput
-                  value={bio}
-                  onChangeText={setBio}
-                  placeholder="Votre biographie"
-                  multiline
-                  numberOfLines={4}
-                  style={{ height: 100 }}
+                <Controller
+                  control={profileControl}
+                  name="bio"
+                  render={({ field: { onChange, value } }) => (
+                    <ThemedTextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Votre biographie"
+                      multiline
+                      numberOfLines={4}
+                      style={{ height: 100 }}
+                    />
+                  )}
                 />
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>NOM</Text>
-                <ThemedTextInput
-                  value={lastName}
-                  onChangeText={setLastName}
-                  placeholder="Votre nom"
+                <Controller
+                  control={profileControl}
+                  name="lastname"
+                  render={({ field: { onChange, value } }) => (
+                    <ThemedTextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Votre nom"
+                    />
+                  )}
                 />
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>PRÉNOM</Text>
-                <ThemedTextInput
-                  value={firstName}
-                  onChangeText={setFirstName}
-                  placeholder="Votre prénom"
+                <Controller
+                  control={profileControl}
+                  name="firstname"
+                  render={({ field: { onChange, value } }) => (
+                    <ThemedTextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Votre prénom"
+                    />
+                  )}
                 />
               </View>
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>EMAIL</Text>
-                <ThemedTextInput
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="votre@email.com"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
+                <Controller
+                  control={profileControl}
+                  name="email"
+                  render={({ field: { onChange, value } }) => (
+                    <ThemedTextInput
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="votre@email.com"
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  )}
                 />
               </View>
               <SettingsItem
                 type="action"
                 label="Modifier le mot de passe"
                 onPress={() => {
-                  setCurrentPassword("");
-                  setNewPassword("");
-                  setConfirmPassword("");
+                  resetPassword();
                   setIsPasswordModalVisible(true);
                 }}
               />
@@ -352,10 +421,10 @@ export default function Settings() {
               <TouchableOpacity
                 style={[
                   styles.saveButton,
-                  (!hasChanges || isUpdating) && styles.saveButtonDisabled,
+                  (!isProfileDirty || isUpdating) && styles.saveButtonDisabled,
                 ]}
-                onPress={handleSave}
-                disabled={!hasChanges || isUpdating}
+                onPress={handleProfileSubmit(onProfileSubmit)}
+                disabled={!isProfileDirty || isUpdating}
               >
                 <Text style={styles.saveButtonText}>
                   {isUpdating ? "ENREGISTREMENT..." : "SAUVEGARDER"}
@@ -431,7 +500,7 @@ export default function Settings() {
                 label="Supprimer mon compte"
                 isDestructive
                 onPress={() => {
-                  setDeleteEmailConfirmation("");
+                  resetDelete();
                   setIsDeleteModalVisible(true);
                 }}
               />
@@ -450,9 +519,9 @@ export default function Settings() {
         type="info"
         primaryButton={{
           label: "Mettre à jour",
-          onPress: handlePasswordUpdate,
+          onPress: handlePasswordSubmit(onPasswordSubmit),
           loading: isUpdatingPassword,
-          disabled: !currentPassword || !newPassword || !confirmPassword,
+          disabled: !isPasswordValid,
         }}
         secondaryButton={{
           label: "Annuler",
@@ -460,26 +529,46 @@ export default function Settings() {
         }}
       >
         <View style={{ gap: 15 }}>
-          <ThemedTextInput
-            value={currentPassword}
-            onChangeText={setCurrentPassword}
-            placeholder="Mot de passe actuel"
-            secureTextEntry
+          <Controller
+            control={passwordControl}
+            name="currentPassword"
+            render={({ field: { onChange, value } }) => (
+              <ThemedTextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Mot de passe actuel"
+                secureTextEntry
+              />
+            )}
           />
-          <ThemedTextInput
-            value={newPassword}
-            onChangeText={setNewPassword}
-            placeholder="Nouveau mot de passe"
-            secureTextEntry
+          <Controller
+            control={passwordControl}
+            name="newPassword"
+            render={({ field: { onChange, value } }) => (
+              <ThemedTextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Nouveau mot de passe"
+                secureTextEntry
+              />
+            )}
           />
-          <ThemedTextInput
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Confirmer le nouveau mot de passe"
-            secureTextEntry
+          <Controller
+            control={passwordControl}
+            name="confirmPassword"
+            render={({ field: { onChange, value } }) => (
+              <ThemedTextInput
+                value={value}
+                onChangeText={onChange}
+                placeholder="Confirmer le nouveau mot de passe"
+                secureTextEntry
+              />
+            )}
           />
         </View>
       </Modal>
+
+      {/* Account Deletion Modal */}
       <Modal
         visible={isDeleteModalVisible}
         onClose={() => setIsDeleteModalVisible(false)}
@@ -487,8 +576,8 @@ export default function Settings() {
         type="danger"
         primaryButton={{
           label: "Supprimer",
-          onPress: handleDeleteAccount,
-          disabled: deleteEmailConfirmation !== email,
+          onPress: handleDeleteSubmit(onDeleteSubmit),
+          disabled: deleteEmailValue !== (user?.email || ""),
           loading: isDeleting,
         }}
         secondaryButton={{
@@ -513,14 +602,20 @@ export default function Settings() {
             fontWeight: "bold",
           }}
         >
-          Veuillez taper votre email "{email}" pour confirmer :
+          Veuillez taper votre email "{user?.email}" pour confirmer :
         </Text>
-        <ThemedTextInput
-          value={deleteEmailConfirmation}
-          onChangeText={setDeleteEmailConfirmation}
-          placeholder={email}
-          keyboardType="email-address"
-          autoCapitalize="none"
+        <Controller
+          control={deleteControl}
+          name="emailConfirmation"
+          render={({ field: { onChange, value } }) => (
+            <ThemedTextInput
+              value={value}
+              onChangeText={onChange}
+              placeholder={user?.email || ""}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          )}
         />
       </Modal>
     </>
