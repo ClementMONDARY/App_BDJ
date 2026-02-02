@@ -137,6 +137,53 @@ export function MyTextComponent() {
 - Use `useAuth()` hook to access user session and auth methods (`signIn`, `signOut`).
 - Secure storage keys should be managed within the Context, not exposed to components.
 
+### 6. Form Handling
+- **Library**: Use `react-hook-form` for state management and `zod` for validation.
+- **Pattern**:
+    - Define a Zod schema for validation.
+    - Infer the type from the schema.
+    - Use `useForm` with `zodResolver`.
+    - Use `Controller` to wrap `ThemedTextInput` or other controlled inputs.
+- **Validation**: Ensure `zod` version compatibility (v3.24.1 recommended for now) to avoid type errors with `@hookform/resolvers`.
+
+```tsx
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const schema = z.object({
+  email: z.string().email("Invalid email"),
+  password: z.string().min(8, "Min 8 chars"),
+});
+
+type FormValues = z.infer<typeof schema>;
+
+export function MyForm() {
+  const { control, handleSubmit, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data: FormValues) => console.log(data);
+
+  return (
+    <View>
+      <Controller
+        control={control}
+        name="email"
+        render={({ field: { onChange, value } }) => (
+          <ThemedTextInput
+            value={value}
+            onChangeText={onChange}
+            error={errors.email?.message}
+          />
+        )}
+      />
+      <Button onPress={handleSubmit(onSubmit)} title="Submit" />
+    </View>
+  );
+}
+```
+
 ---
 
 ## 🛠️ Workflows & Checklists
