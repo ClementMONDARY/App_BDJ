@@ -10,6 +10,7 @@ import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -57,12 +58,12 @@ type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
 export default function Settings() {
   const { user, signOut, authenticatedFetch } = useAuth();
   const { colors, setTheme, isDark, textSize, setTextSize } = useTheme();
+  const queryClient = useQueryClient();
 
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
 
   const [avatar, setAvatar] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   // Profile Form
   const {
@@ -83,7 +84,6 @@ export default function Settings() {
 
   // Password Form
   const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
-  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const {
     control: passwordControl,
     handleSubmit: handlePasswordSubmit,
@@ -101,7 +101,6 @@ export default function Settings() {
 
   // Account Deletion Form
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const {
     control: deleteControl,
     handleSubmit: handleDeleteSubmit,
@@ -115,28 +114,87 @@ export default function Settings() {
   });
   const deleteEmailValue = watchDelete("emailConfirmation");
 
+  // Mutations
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: ProfileFormValues) =>
+      UsersAPI.updateUser(user!.id.toString(), authenticatedFetch, {
+        username: data.username,
+        bio: data.bio,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+      }),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+      alert("Profil mis à jour avec succès !");
+    },
+    onError: (error) => {
+      console.error("Failed to update profile", error);
+      alert("Erreur lors de la mise à jour du profil");
+    },
+  });
+
+  const updatePasswordMutation = useMutation({
+    mutationFn: (newPassword: string) =>
+      UsersAPI.updateUser(user!.id.toString(), authenticatedFetch, {
+        password: newPassword,
+      }),
+    onSuccess: () => {
+      alert("Mot de passe mis à jour avec succès");
+      setIsPasswordModalVisible(false);
+      resetPassword();
+    },
+    onError: (error) => {
+      console.error("Failed to update password", error);
+      alert("Erreur lors de la mise à jour du mot de passe");
+    },
+  });
+
+  const uploadAvatarMutation = useMutation({
+    mutationFn: (uri: string) => UsersAPI.uploadAvatar(uri, authenticatedFetch),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["user", "me"] });
+      setAvatar(data.avatar);
+    },
+    onError: () => {
+      alert("Erreur lors de la mise à jour de l'avatar");
+    },
+  });
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: () =>
+      UsersAPI.deleteAccount(user!.id.toString(), authenticatedFetch),
+    onSuccess: async () => {
+      await signOut();
+      router.replace("/login");
+    },
+    onError: (error) => {
+      console.error("Failed to delete account", error);
+    },
+  });
+
+  // Fetch User Data with React Query
+  const { data: userData } = useQuery({
+    queryKey: ["user", "me"],
+    queryFn: async () => {
+      const response = await authenticatedFetch(`${CONFIG.API_URL}/auth/me`);
+      if (!response.ok) throw new Error("Failed to fetch user");
+      return response.json();
+    },
+    enabled: !!user,
+  });
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await authenticatedFetch(`${CONFIG.API_URL}/auth/me`);
-
-        if (response.ok) {
-          const data = await response.json();
-          setAvatar(data.avatar);
-          resetProfile({
-            username: data.username || "",
-            bio: data.bio || "",
-            firstname: data.firstname || "",
-            lastname: data.lastname || "",
-            email: data.email || "",
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch user profile", error);
-      }
-    };
-
-    if (user) {
+    if (userData) {
+      setAvatar(userData.avatar);
+      resetProfile({
+        username: userData.username || "",
+        bio: userData.bio || "",
+        firstname: userData.firstname || "",
+        lastname: userData.lastname || "",
+        email: userData.email || "",
+      });
+    } else if (user) {
       resetProfile({
         username: user.username || "",
         email: user.email || "",
@@ -144,58 +202,23 @@ export default function Settings() {
         firstname: "",
         lastname: "",
       });
-      fetchUserData();
     }
-  }, [user, resetProfile]);
+  }, [userData, user, resetProfile]);
 
-  const onProfileSubmit = async (data: ProfileFormValues) => {
+  const onProfileSubmit = (data: ProfileFormValues) => {
     if (!user) return;
-
-    setIsUpdating(true);
-    try {
-      await UsersAPI.updateUser(user.id.toString(), authenticatedFetch, {
-        username: data.username,
-        bio: data.bio,
-        firstname: data.firstname,
-        lastname: data.lastname,
-        email: data.email,
-      });
-
-      // Update default values to new values so isDirty resets
-      resetProfile(data);
-
-      alert("Profil mis à jour avec succès !");
-    } catch (error) {
-      console.error("Failed to update profile", error);
-      alert("Erreur lors de la mise à jour du profil");
-    } finally {
-      setIsUpdating(false);
-    }
+    updateProfileMutation.mutate(data);
   };
 
-  const onPasswordSubmit = async (data: PasswordFormValues) => {
+  const onPasswordSubmit = (data: PasswordFormValues) => {
     if (!user) return;
 
-    // Additional check if needed, though zod handles it
     if (data.newPassword !== data.confirmPassword) {
       alert("Les nouveaux mots de passe ne correspondent pas");
       return;
     }
 
-    setIsUpdatingPassword(true);
-    try {
-      await UsersAPI.updateUser(user.id.toString(), authenticatedFetch, {
-        password: data.newPassword,
-      });
-      alert("Mot de passe mis à jour avec succès");
-      setIsPasswordModalVisible(false);
-      resetPassword();
-    } catch (error) {
-      console.error("Failed to update password", error);
-      alert("Erreur lors de la mise à jour du mot de passe");
-    } finally {
-      setIsUpdatingPassword(false);
-    }
+    updatePasswordMutation.mutate(data.newPassword);
   };
 
   const handleLogout = async () => {
@@ -225,39 +248,19 @@ export default function Settings() {
         // Optimistic update
         const oldAvatar = avatar;
         setAvatar(result.assets[0].uri);
-
-        try {
-          const response = await UsersAPI.uploadAvatar(
-            result.assets[0].uri,
-            authenticatedFetch,
-          );
-          // Confirm with server url
-          setAvatar(response.avatar);
-        } catch {
-          // Revert on failure
-          setAvatar(oldAvatar);
-          alert("Erreur lors de la mise à jour de l'avatar");
-        }
+        uploadAvatarMutation.mutate(result.assets[0].uri, {
+          onError: () => setAvatar(oldAvatar),
+        });
       }
     } catch (error) {
       console.error("Avatar pick error:", error);
     }
   };
 
-  const onDeleteSubmit = async () => {
+  const onDeleteSubmit = () => {
     if (!user) return;
-    setIsDeleting(true);
-    try {
-      await UsersAPI.deleteAccount(user.id.toString(), authenticatedFetch);
-      await signOut();
-      router.replace("/login");
-    } catch (error) {
-      console.error("Failed to delete account", error);
-      // Ideally show a toast or alert here
-    } finally {
-      setIsDeleting(false);
-      setIsDeleteModalVisible(false);
-    }
+    deleteAccountMutation.mutate();
+    setIsDeleteModalVisible(false);
   };
 
   const toggleTheme = (value: boolean) => {
@@ -401,13 +404,16 @@ export default function Settings() {
               <TouchableOpacity
                 style={[
                   styles.saveButton,
-                  (!isProfileDirty || isUpdating) && styles.saveButtonDisabled,
+                  (!isProfileDirty || updateProfileMutation.isPending) &&
+                    styles.saveButtonDisabled,
                 ]}
                 onPress={handleProfileSubmit(onProfileSubmit)}
-                disabled={!isProfileDirty || isUpdating}
+                disabled={!isProfileDirty || updateProfileMutation.isPending}
               >
                 <Text style={styles.saveButtonText}>
-                  {isUpdating ? "ENREGISTREMENT..." : "SAUVEGARDER"}
+                  {updateProfileMutation.isPending
+                    ? "ENREGISTREMENT..."
+                    : "SAUVEGARDER"}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -500,7 +506,7 @@ export default function Settings() {
         primaryButton={{
           label: "Mettre à jour",
           onPress: handlePasswordSubmit(onPasswordSubmit),
-          loading: isUpdatingPassword,
+          loading: updatePasswordMutation.isPending,
           disabled: !isPasswordValid,
         }}
         secondaryButton={{
@@ -558,7 +564,7 @@ export default function Settings() {
           label: "Supprimer",
           onPress: handleDeleteSubmit(onDeleteSubmit),
           disabled: deleteEmailValue !== (user?.email || ""),
-          loading: isDeleting,
+          loading: deleteAccountMutation.isPending,
         }}
         secondaryButton={{
           label: "Annuler",
