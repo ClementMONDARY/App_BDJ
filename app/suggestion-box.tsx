@@ -33,7 +33,7 @@ const suggestionSchema = z.object({
 type SuggestionFormValues = z.infer<typeof suggestionSchema>;
 
 export default function SuggestionBox() {
-  const { user, getToken } = useAuth();
+  const { user, authenticatedFetch } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -89,10 +89,11 @@ export default function SuggestionBox() {
 
     try {
       setSubmitting(true);
-      const token = await getToken();
-      if (!token) throw new Error("Token manquant");
-
-      await SuggestionsAPI.submitSuggestion(data.title, data.content, token);
+      await SuggestionsAPI.submitSuggestion(
+        data.title,
+        data.content,
+        authenticatedFetch,
+      );
 
       Alert.alert("Succès", "Votre suggestion a été envoyée !");
       reset();
