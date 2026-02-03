@@ -12,14 +12,15 @@ export interface Suggestion {
 }
 
 export const SuggestionsAPI = {
-  fetchSuggestions: async (token?: string): Promise<Suggestion[]> => {
+  fetchSuggestions: async (
+    fetcher?: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Suggestion[]> => {
     try {
       const headers: HeadersInit = { "Content-Type": "application/json" };
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
 
-      const response = await fetch(`${CONFIG.API_URL}/suggestions/public`, {
+      const doFetch = fetcher || fetch;
+
+      const response = await doFetch(`${CONFIG.API_URL}/suggestions/public`, {
         method: "GET",
         headers,
       });
@@ -39,13 +40,12 @@ export const SuggestionsAPI = {
   submitSuggestion: async (
     title: string,
     content: string,
-    token: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
   ): Promise<void> => {
-    const response = await fetch(`${CONFIG.API_URL}/suggestions/submit`, {
+    const response = await fetcher(`${CONFIG.API_URL}/suggestions/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ title, content }),
     });
@@ -59,13 +59,12 @@ export const SuggestionsAPI = {
   voteSuggestion: async (
     id: string,
     type: "up" | "down",
-    token: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
   ): Promise<void> => {
-    const response = await fetch(`${CONFIG.API_URL}/suggestions/${id}/vote`, {
+    const response = await fetcher(`${CONFIG.API_URL}/suggestions/${id}/vote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ type }),
     });

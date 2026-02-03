@@ -32,7 +32,7 @@ const questionSchema = z.object({
 type QuestionFormValues = z.infer<typeof questionSchema>;
 
 export default function HelpCenter() {
-  const { user, getToken } = useAuth();
+  const { user, authenticatedFetch } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
@@ -85,10 +85,7 @@ export default function HelpCenter() {
 
     try {
       setSubmitting(true);
-      const token = await getToken();
-      if (!token) throw new Error("Impossible de récupérer le token");
-
-      await HelpCenterAPI.submitQuestion(data.question, token);
+      await HelpCenterAPI.submitQuestion(data.question, authenticatedFetch);
 
       Alert.alert("Succès", "Votre question a été envoyée !");
       reset();

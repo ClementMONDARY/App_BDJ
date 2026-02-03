@@ -30,6 +30,7 @@ interface AuthContextType {
   ) => Promise<void>;
   signOut: () => Promise<void>;
   getToken: () => Promise<string | null>;
+  authenticatedFetch: (url: string, options?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -263,6 +264,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signOut,
         getToken: getAccessToken,
+        authenticatedFetch,
       }}
     >
       {children}

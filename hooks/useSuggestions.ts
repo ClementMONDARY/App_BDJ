@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCallback, useEffect, useState } from "react";
 
 export function useSuggestions() {
-  const { getToken } = useAuth();
+  const { authenticatedFetch } = useAuth();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -12,15 +12,14 @@ export function useSuggestions() {
     try {
       setLoading(true);
       setError(null);
-      const token = await getToken();
-      const data = await SuggestionsAPI.fetchSuggestions(token || undefined);
+      const data = await SuggestionsAPI.fetchSuggestions(authenticatedFetch);
       setSuggestions(data);
     } catch (err: any) {
       setError(err.message || "Failed to load suggestions");
     } finally {
       setLoading(false);
     }
-  }, [getToken]);
+  }, [authenticatedFetch]);
 
   useEffect(() => {
     fetchSuggestions();

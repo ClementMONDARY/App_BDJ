@@ -25,12 +25,14 @@ export const HelpCenterAPI = {
     }
   },
 
-  submitQuestion: async (message: string, token: string): Promise<void> => {
-    const response = await fetch(`${CONFIG.API_URL}/questions/submit`, {
+  submitQuestion: async (
+    message: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
+    const response = await fetcher(`${CONFIG.API_URL}/questions/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ message }),
     });

@@ -14,7 +14,7 @@ interface SuggestionItemProps {
 }
 
 export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
-  const { user, getToken } = useAuth();
+  const { user, authenticatedFetch } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const [voting, setVoting] = useState(false);
@@ -49,10 +49,11 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
     }
     try {
       setVoting(true);
-      const token = await getToken();
-      if (!token) return;
-
-      await SuggestionsAPI.voteSuggestion(suggestion.id, type, token);
+      await SuggestionsAPI.voteSuggestion(
+        suggestion.id,
+        type,
+        authenticatedFetch,
+      );
       onVote?.();
     } catch (error) {
       console.error(error);
