@@ -38,13 +38,13 @@ export const UsersAPI = {
     }
   },
 
-  deleteAccount: async (id: string, token: string): Promise<void> => {
+  deleteAccount: async (
+    id: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
     try {
-      const response = await fetch(`${CONFIG.API_URL}/users/${id}`, {
+      const response = await fetcher(`${CONFIG.API_URL}/users/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
 
       if (!response.ok) {
@@ -58,7 +58,7 @@ export const UsersAPI = {
 
   uploadAvatar: async (
     imageUri: string,
-    token: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
   ): Promise<{ avatar: string }> => {
     try {
       const formData = new FormData();
@@ -70,11 +70,8 @@ export const UsersAPI = {
         type: "image/jpeg",
       });
 
-      const response = await fetch(`${CONFIG.API_URL}/users/me/avatar`, {
+      const response = await fetcher(`${CONFIG.API_URL}/users/me/avatar`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       });
 
@@ -93,14 +90,13 @@ export const UsersAPI = {
 
   updateUser: async (
     id: string,
-    token: string,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
     data: UpdateUserParams,
   ): Promise<PublicUser> => {
     try {
-      const response = await fetch(`${CONFIG.API_URL}/users/${id}`, {
+      const response = await fetcher(`${CONFIG.API_URL}/users/${id}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),

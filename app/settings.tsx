@@ -55,7 +55,7 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 type DeleteAccountFormValues = z.infer<typeof deleteAccountSchema>;
 
 export default function Settings() {
-  const { user, signOut, getToken } = useAuth();
+  const { user, signOut, authenticatedFetch } = useAuth();
   const { colors, setTheme, isDark, textSize, setTextSize } = useTheme();
 
   const styles = useThemeStyles(createStyles);
@@ -118,26 +118,18 @@ export default function Settings() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const tokenVal = await getToken();
+        const response = await authenticatedFetch(`${CONFIG.API_URL}/auth/me`);
 
-        if (tokenVal) {
-          const response = await fetch(`${CONFIG.API_URL}/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${tokenVal}`,
-            },
+        if (response.ok) {
+          const data = await response.json();
+          setAvatar(data.avatar);
+          resetProfile({
+            username: data.username || "",
+            bio: data.bio || "",
+            firstname: data.firstname || "",
+            lastname: data.lastname || "",
+            email: data.email || "",
           });
-
-          if (response.ok) {
-            const data = await response.json();
-            setAvatar(data.avatar);
-            resetProfile({
-              username: data.username || "",
-              bio: data.bio || "",
-              firstname: data.firstname || "",
-              lastname: data.lastname || "",
-              email: data.email || "",
-            });
-          }
         }
       } catch (error) {
         console.error("Failed to fetch user profile", error);
@@ -154,28 +146,25 @@ export default function Settings() {
       });
       fetchUserData();
     }
-  }, [user, getToken, resetProfile]);
+  }, [user, resetProfile]);
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     if (!user) return;
 
     setIsUpdating(true);
     try {
-      const token = await getToken();
-      if (token) {
-        await UsersAPI.updateUser(user.id.toString(), token, {
-          username: data.username,
-          bio: data.bio,
-          firstname: data.firstname,
-          lastname: data.lastname,
-          email: data.email,
-        });
+      await UsersAPI.updateUser(user.id.toString(), authenticatedFetch, {
+        username: data.username,
+        bio: data.bio,
+        firstname: data.firstname,
+        lastname: data.lastname,
+        email: data.email,
+      });
 
-        // Update default values to new values so isDirty resets
-        resetProfile(data);
+      // Update default values to new values so isDirty resets
+      resetProfile(data);
 
-        alert("Profil mis à jour avec succès !");
-      }
+      alert("Profil mis à jour avec succès !");
     } catch (error) {
       console.error("Failed to update profile", error);
       alert("Erreur lors de la mise à jour du profil");
@@ -195,15 +184,12 @@ export default function Settings() {
 
     setIsUpdatingPassword(true);
     try {
-      const token = await getToken();
-      if (token) {
-        await UsersAPI.updateUser(user.id.toString(), token, {
-          password: data.newPassword,
-        });
-        alert("Mot de passe mis à jour avec succès");
-        setIsPasswordModalVisible(false);
-        resetPassword();
-      }
+      await UsersAPI.updateUser(user.id.toString(), authenticatedFetch, {
+        password: data.newPassword,
+      });
+      alert("Mot de passe mis à jour avec succès");
+      setIsPasswordModalVisible(false);
+      resetPassword();
     } catch (error) {
       console.error("Failed to update password", error);
       alert("Erreur lors de la mise à jour du mot de passe");
@@ -236,24 +222,21 @@ export default function Settings() {
       });
 
       if (!result.canceled && result.assets[0].uri) {
-        const token = await getToken();
-        if (token) {
-          // Optimistic update
-          const oldAvatar = avatar;
-          setAvatar(result.assets[0].uri);
+        // Optimistic update
+        const oldAvatar = avatar;
+        setAvatar(result.assets[0].uri);
 
-          try {
-            const response = await UsersAPI.uploadAvatar(
-              result.assets[0].uri,
-              token,
-            );
-            // Confirm with server url
-            setAvatar(response.avatar);
-          } catch (error) {
-            // Revert on failure
-            setAvatar(oldAvatar);
-            alert("Erreur lors de la mise à jour de l'avatar");
-          }
+        try {
+          const response = await UsersAPI.uploadAvatar(
+            result.assets[0].uri,
+            authenticatedFetch,
+          );
+          // Confirm with server url
+          setAvatar(response.avatar);
+        } catch {
+          // Revert on failure
+          setAvatar(oldAvatar);
+          alert("Erreur lors de la mise à jour de l'avatar");
         }
       }
     } catch (error) {
@@ -265,12 +248,9 @@ export default function Settings() {
     if (!user) return;
     setIsDeleting(true);
     try {
-      const token = await getToken();
-      if (token) {
-        await UsersAPI.deleteAccount(user.id.toString(), token);
-        await signOut();
-        router.replace("/login");
-      }
+      await UsersAPI.deleteAccount(user.id.toString(), authenticatedFetch);
+      await signOut();
+      router.replace("/login");
     } catch (error) {
       console.error("Failed to delete account", error);
       // Ideally show a toast or alert here
