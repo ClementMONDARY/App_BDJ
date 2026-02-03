@@ -135,6 +135,23 @@ export function MyTextComponent() {
 
 ### 5. Authentication & State
 - Use `useAuth()` hook to access user session and auth methods (`signIn`, `signOut`).
+- **Authenticated Requests**: Use `authenticatedFetch` from `useAuth()` for all API calls requiring authentication.
+    - **Automatic Refresh**: This wrapper automatically handles 401 errors by refreshing the access token and retrying the original request.
+    - **Usage Pattern**: Pass `authenticatedFetch` as an argument to API layer functions instead of passing the raw token string.
+    
+    ```tsx
+    // In your component
+    const { authenticatedFetch } = useAuth();
+    await MyAPI.doSomething(authenticatedFetch);
+    
+    // In your API layer (api/myApi.ts)
+    export const MyAPI = {
+      doSomething: async (fetcher: (url: string, init?: RequestInit) => Promise<Response>) => {
+        const response = await fetcher(`${CONFIG.API_URL}/endpoint`, { method: "POST" });
+        return response.json();
+      }
+    };
+    ```
 - Secure storage keys should be managed within the Context, not exposed to components.
 
 ### 6. Form Handling
