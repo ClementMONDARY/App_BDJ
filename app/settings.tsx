@@ -146,7 +146,7 @@ export default function Settings() {
       });
       fetchUserData();
     }
-  }, [user, resetProfile]);
+  }, [user, resetProfile, authenticatedFetch]);
 
   const onProfileSubmit = async (data: ProfileFormValues) => {
     if (!user) return;

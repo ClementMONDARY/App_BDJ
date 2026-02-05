@@ -112,6 +112,7 @@ export const fonts = {
 
 // Tailles de police
 export const baseFontSize = {
+  xss: 9,
   xs: 12,
   s: 14,
   m: 16,

@@ -2,7 +2,13 @@ import type { Notification } from "@/api/notifications";
 import { Icons } from "@/constants/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fonts, type ThemeColors } from "@/styles";
+import {
+  type baseFontSize,
+  fonts,
+  shadows,
+  spacing,
+  type ThemeColors,
+} from "@/styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AlertItemProps {
@@ -25,15 +31,13 @@ export function AlertItem({
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <View style={styles.iconPlaceholder}>
-              {Icons.alerts(
-                {
-                  size: 14,
-                  color: colors.text,
-                },
-                false,
-              )}
-            </View>
+            {Icons.alerts(
+              {
+                size: 22,
+                color: colors.text,
+              },
+              false,
+            )}
             <Text style={styles.title}>{notification.title}</Text>
           </View>
           {!notification.is_read ? (
@@ -58,11 +62,11 @@ export function AlertItem({
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
   StyleSheet.create({
     wrapper: {
       position: "relative",
-      marginBottom: 10,
+      marginBottom: spacing.sm,
     },
     unreadDot: {
       position: "absolute",
@@ -78,59 +82,44 @@ const createStyles = (colors: ThemeColors) =>
       flex: 1,
       backgroundColor: colors.surface,
       borderRadius: 5,
-      padding: 10,
-      gap: 10,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 0 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 3,
+      padding: spacing.sm,
+      gap: spacing.sm,
+      ...shadows.medium,
     },
     header: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "center",
+      alignItems: "flex-start",
       width: "100%",
+      gap: spacing.sm,
     },
     headerLeft: {
       flexDirection: "row",
-      alignItems: "center",
-      gap: 7,
-      flex: 1, // Allow title to take space
-    },
-    iconPlaceholder: {
-      width: 20,
-      height: 20,
-      borderWidth: 2,
-      borderColor: colors.text,
-      alignItems: "center",
-      justifyContent: "center",
-      borderRadius: 3, // slightly rounded square from mockup look
+      alignItems: "flex-start",
+      gap: spacing.sm,
+      flex: 1,
     },
     title: {
       color: colors.text,
-      fontSize: 12,
-      fontFamily: fonts.primary,
-      fontWeight: "300",
+      fontSize: fontSizes.xs,
+      fontFamily: fonts.primaryBold,
       flexShrink: 1,
     },
     markReadButton: {
       backgroundColor: colors.primary,
       borderRadius: 5,
-      paddingVertical: 5,
-      paddingHorizontal: 10,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
     },
     markReadText: {
       color: colors.white,
-      fontSize: 9,
+      fontSize: fontSizes.xss,
       fontFamily: fonts.primary,
-      fontWeight: "300",
     },
     content: {
       color: colors.text,
-      fontSize: 9,
+      fontSize: fontSizes.xss,
       fontFamily: fonts.primary,
-      fontWeight: "300",
       lineHeight: 14,
     },
   });
