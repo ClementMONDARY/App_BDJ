@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 
-export const icon = {
+export const Icons = {
   index: (
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
@@ -225,6 +225,40 @@ export const icon = {
           r="1.75"
           stroke={props.color}
           strokeWidth="1.5"
+        />
+      </Svg>
+    );
+  },
+  check: (props: any) => {
+    return (
+      <Svg
+        width={props.size || 18}
+        height={props.size || 20}
+        viewBox="0 0 17 12"
+        fill="none"
+      >
+        <Path
+          d="M1 9L4.23309 11.4248C4.66178 11.7463 5.26772 11.6728 5.60705 11.2581L14 1"
+          stroke={props.color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+      </Svg>
+    );
+  },
+  cross: (props: any) => {
+    return (
+      <Svg
+        width={props.size || 14}
+        height={props.size || 14}
+        viewBox="0 0 14 14"
+        fill="none"
+      >
+        <Path
+          d="M13 1L1 13M1 1L13 13"
+          stroke={props.color}
+          strokeWidth="1.5"
+          strokeLinecap="round"
         />
       </Svg>
     );

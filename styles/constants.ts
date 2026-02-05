@@ -20,6 +20,7 @@ export interface ThemeColors {
   primaryDark: string;
   background: string;
   surface: string; // Cards, Inputs, Modals
+  card: string; // Specific for card backgrounds
   inputBackground: string; // Specific for text inputs
   text: string;
   textWhite: string;
@@ -38,6 +39,7 @@ export const lightColors: ThemeColors = {
   primaryDark: palette.primaryDark,
   background: palette.greyLight, // #F5F5F5
   surface: palette.white,
+  card: palette.white,
   inputBackground: palette.white,
   text: palette.black, // #1E1E1E
   textWhite: palette.white,
@@ -56,6 +58,7 @@ export const darkColors: ThemeColors = {
   primaryDark: palette.primaryDark,
   background: palette.darkBg, // #202020
   surface: palette.darkSurface, // #353535
+  card: palette.darkSurface, // #353535
   inputBackground: palette.darkInput, // #454545
   text: palette.white,
   textWhite: palette.white,

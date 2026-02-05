@@ -1,6 +1,6 @@
 import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
 import { UsersAPI } from "@/api/users";
-import { icon } from "@/constants/icons";
+import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
@@ -92,7 +92,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
           onPress={() => handleVote("up")}
           disabled={voting}
         >
-          {icon["thumbs-up"](
+          {Icons["thumbs-up"](
             {
               size: 18,
               color:
@@ -123,7 +123,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
           onPress={() => handleVote("down")}
           disabled={voting}
         >
-          {icon["thumbs-down"](
+          {Icons["thumbs-down"](
             {
               size: 18,
               color:

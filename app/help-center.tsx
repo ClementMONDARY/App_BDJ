@@ -6,7 +6,6 @@ import { QAItem } from "@/components/help-center/QAItem";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useHelpCenterQuestions } from "@/hooks/useHelpCenterQuestions";
-import { useNotifications } from "@/hooks/useNotifications";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -42,26 +41,6 @@ export default function HelpCenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const { questions, loading, refetch } = useHelpCenterQuestions();
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
-
-  // --- TEMPORARY VERIFICATION ---
-  const {
-    notifications,
-    loading: notifLoading,
-    error: notifError,
-  } = useNotifications();
-
-  useEffect(() => {
-    console.log("--- NOTIFICATIONS VERIFICATION ---");
-    console.log("Loading:", notifLoading);
-    console.log("Error:", notifError);
-    console.log("Notifications Count:", notifications.length);
-    if (notifications.length > 0) {
-      console.log("First Notification:", notifications[0]);
-    }
-    console.log("----------------------------------");
-  }, [notifications, notifLoading, notifError]);
-  // ------------------------------
-
   const [submitting, setSubmitting] = useState(false);
 
   const {

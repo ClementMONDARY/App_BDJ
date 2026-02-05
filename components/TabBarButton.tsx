@@ -1,4 +1,4 @@
-import { icon } from "@/constants/icons";
+import { Icons } from "@/constants/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { colors, fonts } from "@/styles";
 import { useEffect } from "react";
@@ -21,7 +21,7 @@ export function TabBarButton({
   onPress: () => void;
   onLongPress: () => void;
   isFocused: boolean;
-  routeName: keyof typeof icon;
+  routeName: keyof typeof Icons;
   color: string;
   label: string;
 }) {
@@ -64,7 +64,7 @@ export function TabBarButton({
       }}
     >
       <Animated.View style={animatedIconStyle}>
-        {icon[routeName](
+        {Icons[routeName](
           {
             color: color,
             size: 24,
@@ -78,7 +78,7 @@ export function TabBarButton({
             color: colors.iconInactive,
             textAlign: "center",
             fontFamily: fonts.primary,
-            fontSize: fontSizes.xs,
+            fontSize: fontSizes.xs - 3,
           },
           animatedTextStyle,
         ]}
