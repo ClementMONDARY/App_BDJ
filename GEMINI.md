@@ -154,7 +154,63 @@ export function MyTextComponent() {
     ```
 - Secure storage keys should be managed within the Context, not exposed to components.
 
-### 6. Form Handling
+### 6. Data Fetching (TanStack Query)
+- **Library**: `@tanstack/react-query` is used for server state management.
+- **Pattern**:
+    - Use `useQuery` for fetching data.
+    - Use `useMutation` for server side effects (POST/PUT/DELETE).
+    - Use `queryClient.invalidateQueries` to refresh data after mutations.
+    - **Query Keys**: Use consistent array keys (e.g., `['suggestions']`, `['events', { id: 1 }]`).
+
+```tsx
+// Fetching
+const { data, isLoading } = useQuery({
+  queryKey: ['resource'],
+  queryFn: () => API.fetchResource(authenticatedFetch),
+});
+
+// Mutation
+const mutation = useMutation({
+  mutationFn: (data) => API.createResource(data, authenticatedFetch),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['resource'] });
+  },
+});
+
+// Mutation
+const mutation = useMutation({
+  mutationFn: (data) => API.createResource(data, authenticatedFetch),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['resource'] });
+  },
+});
+```
+
+### 8. Pull-to-Refresh Pattern
+- **Component**: Use `RefreshControl` from `react-native`.
+- **Integration**: Connect `onRefresh` to the `refetch` method from `useQuery`.
+- **State**: Use `isRefetching` (from `useQuery` result) to control the refreshing spinner.
+
+```tsx
+import { useQuery } from "@tanstack/react-query";
+import { FlatList, RefreshControl } from "react-native";
+
+export function MyList() {
+  const { data, refetch, isRefetching } = useQuery({ ... });
+
+  return (
+    <FlatList
+      data={data}
+      refreshControl={
+        <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+      }
+      renderItem={...}
+    />
+  );
+}
+```
+
+### 9. Form Handling
 - **Library**: Use `react-hook-form` for state management and `zod` for validation.
 - **Pattern**:
     - Define a Zod schema for validation.

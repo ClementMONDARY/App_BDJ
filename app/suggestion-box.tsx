@@ -9,6 +9,7 @@ import { useSuggestions } from "@/hooks/useSuggestions";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -45,7 +46,30 @@ export default function SuggestionBox() {
     [],
   );
 
-  const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Mutation for submitting suggestion
+  const submitMutation = useMutation({
+    mutationFn: (data: SuggestionFormValues) =>
+      SuggestionsAPI.submitSuggestion(
+        data.title,
+        data.content,
+        authenticatedFetch,
+      ),
+    onSuccess: () => {
+      Alert.alert("Succès", "Votre suggestion a été envoyée !");
+      reset();
+      // Invalidate query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Impossible d'envoyer la suggestion";
+      Alert.alert("Erreur", message);
+    },
+  });
 
   const {
     control,
@@ -74,7 +98,7 @@ export default function SuggestionBox() {
     }
   }, [searchQuery, suggestions]);
 
-  const onSubmit = async (data: SuggestionFormValues) => {
+  const onSubmit = (data: SuggestionFormValues) => {
     if (!user) {
       Alert.alert(
         "Connexion requise",
@@ -87,26 +111,7 @@ export default function SuggestionBox() {
       return;
     }
 
-    try {
-      setSubmitting(true);
-      await SuggestionsAPI.submitSuggestion(
-        data.title,
-        data.content,
-        authenticatedFetch,
-      );
-
-      Alert.alert("Succès", "Votre suggestion a été envoyée !");
-      reset();
-      refetch();
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Impossible d'envoyer la suggestion";
-      Alert.alert("Erreur", message);
-    } finally {
-      setSubmitting(false);
-    }
+    submitMutation.mutate(data);
   };
 
   const renderHeader = () => (
@@ -165,7 +170,7 @@ export default function SuggestionBox() {
       <ThemedButton
         title="Envoyer"
         onPress={handleSubmit(onSubmit)}
-        loading={submitting}
+        loading={submitMutation.isPending}
       />
     </View>
   );
