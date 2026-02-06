@@ -99,8 +99,7 @@ export default function Alerts() {
 
   // 4. Main List
   return (
-    <View>
-      {" "}
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       -- No style=common.mainContentContainer because of the FlatList overflow
       issue --
       <FlatList
