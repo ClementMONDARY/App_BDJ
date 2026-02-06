@@ -110,7 +110,7 @@ export default function SuggestionBox() {
   };
 
   const renderHeader = () => (
-    <View style={styles.headerContainer}>
+    <View>
       <ThemedTextInput
         placeholder="Rechercher des mots clés"
         value={searchQuery}
@@ -211,10 +211,6 @@ export default function SuggestionBox() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    headerContainer: {
-      marginBottom: 0,
-      gap: 30,
-    },
     listContent: {
       padding: spacing.paddingMain,
       backgroundColor: colors.background,

@@ -100,7 +100,7 @@ export default function HelpCenter() {
   };
 
   const renderHeader = () => (
-    <View style={styles.headerContainer}>
+    <View>
       <ThemedTextInput
         placeholder="Rechercher des mots clés"
         value={searchQuery}
@@ -185,10 +185,6 @@ const createStyles = (colors: ThemeColors) =>
     listContent: {
       padding: spacing.paddingMain,
       backgroundColor: colors.background, // Ensure seamless background
-    },
-    headerContainer: {
-      marginBottom: 0,
-      gap: 30,
     },
     emptyText: {
       textAlign: "center",
