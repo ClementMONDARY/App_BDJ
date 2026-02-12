@@ -25,19 +25,29 @@ export function AlertItem({
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
 
+  const getIcon = (type: string, props: { size: number; color: string }) => {
+    switch (type) {
+      case "forum":
+        return Icons.forum(props, false);
+      case "article":
+        return Icons.article(props, false);
+      case "message":
+        return Icons.message(props, false);
+      default:
+        return Icons.alerts(props, false);
+    }
+  };
+
   return (
     <View style={styles.wrapper}>
       {!notification.is_read && <View style={styles.unreadDot} />}
       <View style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            {Icons.alerts(
-              {
-                size: 22,
-                color: colors.text,
-              },
-              false,
-            )}
+            {getIcon(notification.type, {
+              size: 22,
+              color: colors.text,
+            })}
             <Text style={styles.title}>{notification.title}</Text>
           </View>
           {!notification.is_read ? (

@@ -203,7 +203,7 @@ export default function Settings() {
         lastname: "",
       });
     }
-  }, [user, resetProfile, authenticatedFetch]);
+  }, [userData, user, resetProfile]);
 
   const onProfileSubmit = (data: ProfileFormValues) => {
     if (!user) return;

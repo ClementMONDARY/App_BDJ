@@ -12,6 +12,21 @@ export const Icons = {
   ) => (
     <Ionicons {...props} name={focused ? "megaphone" : "megaphone-outline"} />
   ),
+  message: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => (
+    <Ionicons
+      {...props}
+      name={focused ? "chatbubbles" : "chatbubbles-outline"}
+    />
+  ),
+  article: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => (
+    <Ionicons {...props} name={focused ? "newspaper" : "newspaper-outline"} />
+  ),
   events: (
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
