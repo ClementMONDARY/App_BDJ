@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -17,7 +18,6 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
   const { user, authenticatedFetch } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
-  const [voting, setVoting] = useState(false);
   const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,25 +42,26 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
     minute: "2-digit",
   });
 
-  const handleVote = async (type: "up" | "down") => {
+  const queryClient = useQueryClient();
+
+  const voteMutation = useMutation({
+    mutationFn: ({ id, type }: { id: string; type: "up" | "down" }) =>
+      SuggestionsAPI.voteSuggestion(id, type, authenticatedFetch),
+    onSuccess: () => {
+      onVote?.();
+      queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible de voter.");
+    },
+  });
+
+  const handleVote = (type: "up" | "down") => {
     if (!user) {
       Alert.alert("Connexion requise", "Connectez-vous pour voter.");
       return;
     }
-    try {
-      setVoting(true);
-      await SuggestionsAPI.voteSuggestion(
-        suggestion.id,
-        type,
-        authenticatedFetch,
-      );
-      onVote?.();
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Erreur", "Impossible de voter.");
-    } finally {
-      setVoting(false);
-    }
+    voteMutation.mutate({ id: suggestion.id, type });
   };
 
   return (
@@ -90,7 +91,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
         <Pressable
           style={styles.voteButton}
           onPress={() => handleVote("up")}
-          disabled={voting}
+          disabled={voteMutation.isPending}
         >
           {Icons["thumbs-up"](
             {
@@ -121,7 +122,7 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
         <Pressable
           style={styles.voteButton}
           onPress={() => handleVote("down")}
-          disabled={voting}
+          disabled={voteMutation.isPending}
         >
           {Icons["thumbs-down"](
             {
