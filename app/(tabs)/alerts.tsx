@@ -1,5 +1,6 @@
 import type { Notification } from "@/api/notifications";
 import { AlertItem } from "@/components/alerts/AlertItem";
+import { FilterSlider } from "@/components/global/filter/FilterSlider";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -22,6 +23,7 @@ export default function Alerts() {
   const { user } = useAuth();
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState("recent");
   const [filteredNotifications, setFilteredNotifications] = useState<
     Notification[]
   >([]);
@@ -38,25 +40,49 @@ export default function Alerts() {
   } = useNotifications();
 
   useEffect(() => {
-    if (!searchQuery.trim()) {
-      setFilteredNotifications(notifications);
-    } else {
+    let result = notifications;
+
+    // Apply filter
+    if (filter === "unread") {
+      result = result.filter((n) => !n.is_read);
+    } else if (filter !== "recent") {
+      // For specific types (topic, article, messaging)
+      result = result.filter((n) => n.type === filter);
+    }
+
+    // Apply search
+    if (searchQuery.trim()) {
       const lowerQuery = searchQuery.toLowerCase();
-      const filtered = notifications.filter(
+      result = result.filter(
         (n) =>
           n.title.toLowerCase().includes(lowerQuery) ||
           n.content.toLowerCase().includes(lowerQuery),
       );
-      setFilteredNotifications(filtered);
     }
-  }, [searchQuery, notifications]);
 
-  const renderSearchBar = () => (
-    <ThemedTextInput
-      placeholder="Rechercher des mots clés"
-      value={searchQuery}
-      onChangeText={setSearchQuery}
-    />
+    setFilteredNotifications(result);
+  }, [searchQuery, notifications, filter]);
+
+  const renderHeader = () => (
+    <View style={{ gap: spacing.md, marginBottom: spacing.md }}>
+      <ThemedTextInput
+        placeholder="Rechercher des mots clés"
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={{ marginBottom: 0 }}
+      />
+      <FilterSlider
+        options={[
+          { label: "Récent", value: "recent" },
+          { label: "Non lues", value: "unread" },
+          { label: "Forum", value: "forum" },
+          { label: "Article", value: "article" },
+          { label: "Message", value: "messaging" },
+        ]}
+        selectedOption={filter}
+        onSelect={setFilter}
+      />
+    </View>
   );
 
   // 1. Not Connected State
@@ -113,7 +139,7 @@ export default function Alerts() {
           />
         )}
         keyExtractor={(item) => item.id.toString()}
-        ListHeaderComponent={renderSearchBar()}
+        ListHeaderComponent={renderHeader()}
         refreshControl={
           <RefreshControl
             refreshing={loading}

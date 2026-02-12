@@ -640,7 +640,7 @@ const createStyles = (colors: ThemeColors) =>
     },
     fieldsContainer: {
       width: "100%",
-      gap: 5,
+      gap: 20,
       marginBottom: 30,
     },
     inputGroup: {

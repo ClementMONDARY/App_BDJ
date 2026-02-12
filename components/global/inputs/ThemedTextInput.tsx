@@ -49,7 +49,6 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
       borderColor: colors.border,
       overflow: "hidden",
       width: "100%",
-      marginBottom: spacing.md,
     },
     input: {
       padding: 12,

@@ -100,7 +100,7 @@ export default function HelpCenter() {
   };
 
   const renderHeader = () => (
-    <View>
+    <View style={styles.headerContainer}>
       <ThemedTextInput
         placeholder="Rechercher des mots clés"
         value={searchQuery}
@@ -182,6 +182,10 @@ export default function HelpCenter() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
+    headerContainer: {
+      marginBottom: 0,
+      gap: 30,
+    },
     listContent: {
       padding: spacing.paddingMain,
       backgroundColor: colors.background, // Ensure seamless background

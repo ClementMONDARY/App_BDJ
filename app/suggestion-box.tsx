@@ -110,7 +110,7 @@ export default function SuggestionBox() {
   };
 
   const renderHeader = () => (
-    <View>
+    <View style={styles.headerContainer}>
       <ThemedTextInput
         placeholder="Rechercher des mots clés"
         value={searchQuery}
@@ -214,6 +214,10 @@ const createStyles = (colors: ThemeColors) =>
     listContent: {
       padding: spacing.paddingMain,
       backgroundColor: colors.background,
+    },
+    headerContainer: {
+      marginBottom: 0,
+      gap: 30,
     },
     emptyText: {
       textAlign: "center",
