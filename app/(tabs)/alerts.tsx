@@ -125,7 +125,13 @@ export default function Alerts() {
 
   // 4. Main List
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        paddingBottom: spacing["3xl"],
+      }}
+    >
       -- No style=common.mainContentContainer because of the FlatList overflow
       issue --
       <FlatList
