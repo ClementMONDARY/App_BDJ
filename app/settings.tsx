@@ -3,7 +3,7 @@ import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { Modal } from "@/components/global/Modal";
 import { SettingsItem } from "@/components/settings/SettingsItem";
 import { CONFIG } from "@/constants/Config";
-import { icon } from "@/constants/icons";
+import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
@@ -203,7 +203,7 @@ export default function Settings() {
         lastname: "",
       });
     }
-  }, [userData, user, resetProfile]);
+  }, [user, resetProfile, authenticatedFetch]);
 
   const onProfileSubmit = (data: ProfileFormValues) => {
     if (!user) return;
@@ -309,7 +309,7 @@ export default function Settings() {
                     style={styles.avatar}
                   />
                   <View style={styles.statusIndicator}>
-                    {icon.camera({ size: 14, color: colors.white }, true)}
+                    {Icons.camera({ size: 14, color: colors.white }, true)}
                   </View>
                 </TouchableOpacity>
               </View>

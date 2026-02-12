@@ -1,4 +1,4 @@
-import { icon } from "@/constants/icons";
+import { Icons } from "@/constants/icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, type ThemeColors } from "@/styles";
@@ -7,7 +7,7 @@ import { Link } from "expo-router";
 import { StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
 
 export type SettingsItemType = "bool" | "select" | "link" | "action";
-export type IconName = keyof typeof icon;
+export type IconName = keyof typeof Icons;
 
 interface SettingsItemProps {
   type: SettingsItemType;
@@ -36,7 +36,7 @@ export function SettingsItem({
 }: SettingsItemProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
-  const IconComponent = iconName ? (icon[iconName] as any) : null;
+  const IconComponent = iconName ? (Icons[iconName] as any) : null;
 
   // Determine colors based on state
   let textColor = colors.text;

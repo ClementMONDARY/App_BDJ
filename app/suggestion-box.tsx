@@ -216,13 +216,13 @@ export default function SuggestionBox() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    headerContainer: {
-      marginBottom: 0,
-      gap: 30,
-    },
     listContent: {
       padding: spacing.paddingMain,
       backgroundColor: colors.background,
+    },
+    headerContainer: {
+      marginBottom: 0,
+      gap: 30,
     },
     emptyText: {
       textAlign: "center",

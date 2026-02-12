@@ -5,6 +5,7 @@ import {
   fonts,
   type fontSize,
   shadows,
+  spacing,
   type ThemeColors,
 } from "@/styles";
 import { forwardRef } from "react";

@@ -25,6 +25,8 @@ export const createCommonStyles = (colors: ThemeColors, fontSizes: FontSizes) =>
       alignItems: "center",
       display: "flex",
       flex: 1,
+      overflow: "visible",
+      gap: spacing.md,
     },
     // Conteneurs
     container: {

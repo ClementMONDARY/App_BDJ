@@ -41,7 +41,6 @@ export default function HelpCenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const { questions, loading, refetch } = useHelpCenterQuestions();
   const [filteredQuestions, setFilteredQuestions] = useState<Question[]>([]);
-
   const [submitting, setSubmitting] = useState(false);
 
   const {
@@ -183,13 +182,13 @@ export default function HelpCenter() {
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
-    listContent: {
-      padding: spacing.paddingMain,
-      backgroundColor: colors.background, // Ensure seamless background
-    },
     headerContainer: {
       marginBottom: 0,
       gap: 30,
+    },
+    listContent: {
+      padding: spacing.paddingMain,
+      backgroundColor: colors.background, // Ensure seamless background
     },
     emptyText: {
       textAlign: "center",
