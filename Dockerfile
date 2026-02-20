@@ -1,0 +1,22 @@
+FROM node:20-slim
+
+RUN apt-get update && apt-get install -y \
+    bash \
+    git \
+    openssh-client \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+EXPOSE 8081
+EXPOSE 19000
+EXPOSE 19001
+EXPOSE 19002
+
+CMD ["npx", "expo", "start", "--lan"]
