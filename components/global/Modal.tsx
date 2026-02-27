@@ -42,7 +42,7 @@ export function Modal({
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
 
-  let headerColor = colors.primary;
+  let headerColor = colors.text;
   let primaryBtnColor = colors.primary;
 
   if (type === "warning") {
