@@ -44,7 +44,7 @@ export const Icons = {
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
   ) => <Ionicons {...props} name={focused ? "shield" : "shield-outline"} />,
-    heart: (
+  heart: (
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
   ) => <Ionicons {...props} name={focused ? "heart" : "heart-outline"} />,
@@ -299,9 +299,7 @@ export const Icons = {
       </Svg>
     );
   },
-    "topic-details": (
-    props: Partial<React.ComponentProps<typeof Ionicons>>,
-  ) => (
+  "topic-details": (props: Partial<React.ComponentProps<typeof Ionicons>>) => (
     <Ionicons {...props} name="chatbubble-outline" />
   ),
 };

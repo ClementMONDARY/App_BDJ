@@ -73,7 +73,9 @@ export const ForumAPI = {
    * GET /forum/topics/:id/messagers (Public)
    * List users who replied to a topic.
    */
-  fetchTopicMessagers: async (topicId: number): Promise<TopicMessagersResponse> => {
+  fetchTopicMessagers: async (
+    topicId: number,
+  ): Promise<TopicMessagersResponse> => {
     const response = await fetch(
       `${CONFIG.API_URL}/forum/topics/${topicId}/messagers`,
       {

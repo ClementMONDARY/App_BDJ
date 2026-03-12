@@ -54,8 +54,7 @@ export default function Forum() {
     // 1. Apply filter
     if (activeFilter === "popular") {
       result.sort(
-        (a, b) =>
-          b.like_count + b.msg_count - (a.like_count + a.msg_count),
+        (a, b) => b.like_count + b.msg_count - (a.like_count + a.msg_count),
       );
     } else if (activeFilter === "recent") {
       result.sort(

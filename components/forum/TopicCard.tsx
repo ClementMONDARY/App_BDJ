@@ -46,10 +46,7 @@ export function TopicCard({ topic }: TopicCardProps) {
 
   // Full unique set: author + messagers (author may already be in messagerIds)
   const allParticipantIds: number[] = Array.from(
-    new Set([
-      ...(topic.author_id ? [topic.author_id] : []),
-      ...messagerIds,
-    ]),
+    new Set([...(topic.author_id ? [topic.author_id] : []), ...messagerIds]),
   );
 
   // Build avatar list: creator first, then up to 4 others
@@ -68,10 +65,12 @@ export function TopicCard({ topic }: TopicCardProps) {
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: topicsQueryKey });
       const previous = queryClient.getQueryData<Topic[]>(topicsQueryKey);
-      queryClient.setQueryData<Topic[]>(topicsQueryKey, (old) =>
-        old?.map((t) =>
-          t.id === topic.id ? { ...t, is_followed: !t.is_followed } : t,
-        ) ?? [],
+      queryClient.setQueryData<Topic[]>(
+        topicsQueryKey,
+        (old) =>
+          old?.map((t) =>
+            t.id === topic.id ? { ...t, is_followed: !t.is_followed } : t,
+          ) ?? [],
       );
       return { previous };
     },
