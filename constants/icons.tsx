@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import Svg, { Circle, Path, Rect } from "react-native-svg";
+import Svg, { Circle, Mask, Path, Rect } from "react-native-svg";
 
 export const Icons = {
   index: (
@@ -44,6 +44,10 @@ export const Icons = {
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
   ) => <Ionicons {...props} name={focused ? "shield" : "shield-outline"} />,
+    heart: (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+    focused: boolean,
+  ) => <Ionicons {...props} name={focused ? "heart" : "heart-outline"} />,
   "thumbs-up": (props: any, focused: boolean) => {
     // Props contains color (e.g. #929292 or primary) and size
     return (
@@ -278,4 +282,26 @@ export const Icons = {
       </Svg>
     );
   },
+  eye: (props: any) => {
+    return (
+      <Svg
+        width={props.size || 23}
+        height={props.size || 23}
+        viewBox="0 0 23 23"
+        fill="none"
+      >
+        <Path
+          d="M11.5001 4.7915C6.31601 4.7915 3.42117 8.79765 2.37329 10.6182C2.15242 11.0019 2.04199 11.1938 2.0541 11.4833C2.06621 11.7728 2.19621 11.9605 2.45621 12.3358C3.702 14.134 7.01901 18.2082 11.5001 18.2082C15.9812 18.2082 19.2982 14.134 20.544 12.3358C20.804 11.9605 20.934 11.7728 20.9461 11.4833C20.9582 11.1938 20.8477 11.0019 20.6269 10.6182C19.579 8.79765 16.6842 4.7915 11.5001 4.7915Z"
+          stroke={props.color}
+          strokeWidth="2"
+        />
+        <Circle cx="11.5001" cy="11.4998" r="3.83333" fill={props.color} />
+      </Svg>
+    );
+  },
+    "topic-details": (
+    props: Partial<React.ComponentProps<typeof Ionicons>>,
+  ) => (
+    <Ionicons {...props} name="chatbubble-outline" />
+  ),
 };
