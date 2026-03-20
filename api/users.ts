@@ -18,6 +18,24 @@ export interface UpdateUserParams {
   password?: string;
 }
 
+export const getAvatarUri = (
+  avatar: string | null | undefined,
+): string | null => {
+  if (!avatar) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(avatar)) {
+    return avatar;
+  }
+
+  if (avatar.startsWith("/")) {
+    return `${CONFIG.API_URL}${avatar}`;
+  }
+
+  return `${CONFIG.API_URL}/${avatar}`;
+};
+
 export const UsersAPI = {
   getUserPublicInfo: async (id: string): Promise<PublicUser> => {
     try {

@@ -1,4 +1,4 @@
-import { UsersAPI } from "@/api/users";
+import { getAvatarUri, UsersAPI } from "@/api/users";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { fonts } from "@/styles";
@@ -95,14 +95,21 @@ export default function Header(props: any) {
                 // Optional: Navigate to profile
               }}
             >
-              <Image
-                source={{
-                  uri:
-                    avatar ||
-                    `https://avatar.iran.liara.run/public?username=${user.username || user.id}`,
-                }}
-                style={{ width: 45, height: 45, borderRadius: 22.5 }}
-              />
+              {(() => {
+                const computedUri = getAvatarUri(avatar);
+                return computedUri ? (
+                  <Image
+                    source={{ uri: computedUri }}
+                    style={{ width: 45, height: 45, borderRadius: 22.5 }}
+                  />
+                ) : (
+                  <Ionicons
+                    name="person-circle-outline"
+                    size={45}
+                    color={colors.iconInactive}
+                  />
+                );
+              })()}
             </Pressable>
           ) : (
             <Link href="/login" asChild>

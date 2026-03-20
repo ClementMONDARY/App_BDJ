@@ -1,10 +1,11 @@
 import { type Suggestion, SuggestionsAPI } from "@/api/suggestions";
-import { UsersAPI } from "@/api/users";
+import { getAvatarUri, UsersAPI } from "@/api/users";
 import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, shadows, type ThemeColors } from "@/styles";
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -68,14 +69,29 @@ export function SuggestionItem({ suggestion, onVote }: SuggestionItemProps) {
     <View style={styles.container}>
       {/* Avatar + Title + Date */}
       <View style={styles.header}>
-        <Image
-          source={{
-            uri:
-              avatar ||
-              `https://avatar.iran.liara.run/public?username=${suggestion.user_id}`,
-          }}
-          style={styles.avatar}
-        />
+        {(() => {
+          const avatarUri = getAvatarUri(avatar);
+          return avatarUri ? (
+            <Image source={{ uri: avatarUri }} style={styles.avatar} />
+          ) : (
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: colors.border,
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              ]}
+            >
+              <Ionicons
+                name="person-circle-outline"
+                size={24}
+                color={colors.iconInactive}
+              />
+            </View>
+          );
+        })()}
         <View style={styles.headerInfo}>
           <Text style={styles.title}>{suggestion.title}</Text>
           <Text style={styles.date}>{formattedDate}</Text>

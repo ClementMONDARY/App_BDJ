@@ -1,4 +1,5 @@
 import { ForumAPI, type Topic } from "@/api/forum";
+import { getAvatarUri, UsersAPI } from "@/api/users";
 import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -10,7 +11,9 @@ import {
   shadows,
   type ThemeColors,
 } from "@/styles";
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 // --- Types ---
@@ -20,9 +23,6 @@ interface TopicCardProps {
 }
 
 // --- Avatar helpers ---
-
-const AVATAR_URL = (id: number) =>
-  `https://avatar.iran.liara.run/public?username=${id}`;
 
 const CREATOR_SIZE = 30;
 const PARTICIPANT_SIZE = 25;
@@ -35,6 +35,9 @@ export function TopicCard({ topic }: TopicCardProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const queryClient = useQueryClient();
+  const [participantAvatars, setParticipantAvatars] = useState<
+    Record<number, string | null>
+  >({});
 
   // Fetch messagers for this topic
   const { data: messagersData } = useQuery({
@@ -58,6 +61,26 @@ export function TopicCard({ topic }: TopicCardProps) {
     : participantIds;
   const displayedAvatars = avatarIds.slice(0, MAX_AVATARS);
   const totalOverflow = Math.max(0, allParticipantIds.length - MAX_AVATARS);
+
+  useEffect(() => {
+    const fetchAvatars = async () => {
+      const entries = await Promise.all(
+        displayedAvatars.map(async (id) => {
+          try {
+            const profile = await UsersAPI.getUserPublicInfo(id.toString());
+            return [id, profile.avatar] as [number, string | null];
+          } catch {
+            return [id, null] as [number, string | null];
+          }
+        }),
+      );
+      setParticipantAvatars(Object.fromEntries(entries));
+    };
+
+    if (displayedAvatars.length > 0) {
+      fetchAvatars();
+    }
+  }, [displayedAvatars]);
 
   const topicsQueryKey = ["forum", "topics", user?.id ?? null];
   const followMutation = useMutation({
@@ -106,14 +129,7 @@ export function TopicCard({ topic }: TopicCardProps) {
             style={styles.coverImage}
             resizeMode="cover"
           />
-        ) : (
-          <View style={[styles.coverImage, styles.coverPlaceholder]}>
-            {Icons["thumbs-up"](
-              { size: 28, color: colors.iconInactive },
-              false,
-            )}
-          </View>
-        )}
+        ) : null}
 
         {/* Title + preview */}
         <View style={styles.topContent}>
@@ -153,10 +169,31 @@ export function TopicCard({ topic }: TopicCardProps) {
             const isCreator = index === 0 && id === topic.author_id;
             const size = isCreator ? CREATOR_SIZE : PARTICIPANT_SIZE;
             const role = isCreator ? "creator" : "participant";
+            const avatarUrl = participantAvatars[id];
+            const imageUri = getAvatarUri(avatarUrl);
+
+            if (imageUri) {
+              return (
+                <Image
+                  key={`${role}-${id}`}
+                  source={{ uri: imageUri }}
+                  style={[
+                    styles.avatar,
+                    {
+                      width: size,
+                      height: size,
+                      borderRadius: size / 2,
+                      marginLeft: index === 0 ? 0 : -6,
+                      zIndex: MAX_AVATARS - index,
+                    },
+                  ]}
+                />
+              );
+            }
+
             return (
-              <Image
+              <View
                 key={`${role}-${id}`}
-                source={{ uri: AVATAR_URL(id) }}
                 style={[
                   styles.avatar,
                   {
@@ -165,9 +202,18 @@ export function TopicCard({ topic }: TopicCardProps) {
                     borderRadius: size / 2,
                     marginLeft: index === 0 ? 0 : -6,
                     zIndex: MAX_AVATARS - index,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: colors.border,
                   },
                 ]}
-              />
+              >
+                <Ionicons
+                  name="person-circle-outline"
+                  size={Math.round(size * 0.5)}
+                  color={colors.iconInactive}
+                />
+              </View>
             );
           })}
           {totalOverflow > 0 && (

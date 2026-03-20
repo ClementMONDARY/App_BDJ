@@ -1,4 +1,4 @@
-import { UsersAPI } from "@/api/users";
+import { getAvatarUri, UsersAPI } from "@/api/users";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { Modal } from "@/components/global/Modal";
 import { SettingsItem } from "@/components/settings/SettingsItem";
@@ -7,7 +7,7 @@ import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fontSize, fonts, type ThemeColors } from "@/styles";
+import { fonts, fontSize, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -298,16 +298,32 @@ export default function Settings() {
                   onPress={handleAvatarPick}
                   activeOpacity={0.8}
                 >
-                  <Image
-                    source={{
-                      uri:
-                        avatar ||
-                        `https://avatar.iran.liara.run/public?username=${
-                          user?.username || "User"
-                        }`,
-                    }}
-                    style={styles.avatar}
-                  />
+                  {(() => {
+                    const avatarUri = getAvatarUri(avatar);
+                    return avatarUri ? (
+                      <Image
+                        source={{ uri: avatarUri }}
+                        style={styles.avatar}
+                      />
+                    ) : (
+                      <View
+                        style={[
+                          styles.avatar,
+                          {
+                            backgroundColor: colors.border,
+                            alignItems: "center",
+                            justifyContent: "center",
+                          },
+                        ]}
+                      >
+                        <Ionicons
+                          name="person-circle-outline"
+                          size={60}
+                          color={colors.iconInactive}
+                        />
+                      </View>
+                    );
+                  })()}
                   <View style={styles.statusIndicator}>
                     {Icons.camera({ size: 14, color: colors.white }, true)}
                   </View>
