@@ -12,6 +12,7 @@ import {
   type ThemeColors,
 } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
+import Feather from '@expo/vector-icons/Feather';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -225,12 +226,12 @@ export function TopicCard({ topic }: TopicCardProps) {
         <View style={styles.counters}>
           {/* Views */}
           <View style={styles.counterItem}>
-            {Icons.eye({ size: 18, color: colors.text })}
+            <Feather name="eye" size={18} color={colors.text} />
             <Text style={styles.counterText}>{topic.view_count}</Text>
           </View>
           {/* Likes */}
           <View style={styles.counterItem}>
-            {Icons["thumbs-up"]({ size: 18, color: colors.text }, false)}
+            <Feather name="thumbs-up" size={18} color={colors.text} />
             <Text style={styles.counterText}>{topic.like_count}</Text>
           </View>
           {/* Messages */}
