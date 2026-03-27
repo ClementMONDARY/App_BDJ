@@ -1,12 +1,16 @@
 import { ForumAPI, type Topic } from "@/api/forum";
 import { TopicCard } from "@/components/forum/TopicCard";
+import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { FilterSlider } from "@/components/global/filter/FilterSlider";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fonts, spacing, type baseFontSize, type ThemeColors } from "@/styles";
+import { type baseFontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { Ionicons } from "@expo/vector-icons";
+import Feather from '@expo/vector-icons/Feather';
 import { useQuery } from "@tanstack/react-query";
+import { Link, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -14,6 +18,7 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 
@@ -29,6 +34,7 @@ export default function Forum() {
   const { user, authenticatedFetch } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterValue>("popular");
@@ -135,6 +141,15 @@ export default function Forum() {
           </View>
         }
       />
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => router.push("/new-topic-form")}
+        activeOpacity={0.8}
+      >
+        <View style={styles.floatingButtonInner}>
+          <Ionicons name="add-circle-outline" size={45} color="white" />
+        </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -177,5 +192,31 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       fontSize: fontSizes.s,
       color: colors.error,
       textAlign: "center",
+    },
+    floatingButton: {
+      position: "absolute",
+      right: spacing.sm,
+      bottom: spacing.lg + 112, // 115 = height of bottom nav + some margin
+      width: 60,
+      height: 60,
+      borderRadius: 9999,
+      backgroundColor: "#257A83",
+      borderWidth: 2,
+      borderColor: "#1A555B",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 6,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    floatingButtonInner: {
+      width: "100%",
+      height: "100%",
+      borderRadius: 9999,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: "#257A83",
     },
   });
