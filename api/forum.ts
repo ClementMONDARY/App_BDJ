@@ -1,5 +1,5 @@
-import { z } from "zod";
 import { CONFIG } from "@/constants/Config";
+import { z } from "zod";
 
 // --- DTOs ---
 
@@ -23,9 +23,17 @@ export const ZTopicMessagersResponse = z.object({
   users_ids: z.array(z.number().int()),
 });
 
+export const ZCreateTopicInput = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  cover_image: z.string().optional(),
+  attachment_urls: z.array(z.string()).max(5).optional(),
+});
+
 export type Topic = z.infer<typeof ZTopic>;
 export type TopicList = z.infer<typeof ZTopicList>;
 export type TopicMessagersResponse = z.infer<typeof ZTopicMessagersResponse>;
+export type CreateTopicInput = z.infer<typeof ZCreateTopicInput>;
 
 // --- API ---
 
@@ -90,5 +98,24 @@ export const ForumAPI = {
 
     const data = await response.json();
     return ZTopicMessagersResponse.parse(data);
+  },
+
+  /**
+   * POST /forum/topics/ (Connected)
+   * Create a new discussion topic.
+   */
+  createTopic: async (
+    input: CreateTopicInput,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
+    const response = await fetcher(`${CONFIG.API_URL}/forum/topics`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(input),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create topic");
+    }
   },
 };
