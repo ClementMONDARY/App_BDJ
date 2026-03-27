@@ -16,9 +16,11 @@ export function FormField({ label, error, children, style }: FormFieldProps) {
 
   return (
     <View style={[styles.field, style]}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.labelContainer}>
+        <Text style={styles.label}>{label}</Text>
+        {error && <Text style={styles.errorText}>{error}</Text>}
+      </View>
       {children}
-      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
@@ -27,6 +29,11 @@ const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     field: {
       marginBottom: spacing.lg,
+    },
+    labelContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
     },
     label: {
       fontSize: 16,
@@ -37,6 +44,5 @@ const createStyles = (colors: ThemeColors) =>
     errorText: {
       color: colors.error,
       fontSize: 14,
-      marginTop: spacing.xs,
     },
   });
