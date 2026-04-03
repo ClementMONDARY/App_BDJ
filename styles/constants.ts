@@ -129,6 +129,7 @@ export const borderRadius = {
   s: 5,
   m: 10,
   l: 15,
+  full: 9999,
 };
 
 // Ombres
