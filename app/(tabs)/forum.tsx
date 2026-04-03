@@ -10,9 +10,10 @@ import { type baseFontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useRouter } from "expo-router";
-import { useMemo, useState } from "react";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   ActivityIndicator,
   FlatList,
   RefreshControl,
@@ -36,8 +37,17 @@ export default function Forum() {
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
 
+  const { filter } = useLocalSearchParams<{ filter?: FilterValue }>();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterValue>("popular");
+
+  useEffect(() => {
+    if (filter === "recent") {
+      setActiveFilter("recent");
+      router.setParams({ filter: undefined });
+    }
+  }, [filter, router]);
 
   const {
     data: topics,
@@ -143,7 +153,16 @@ export default function Forum() {
       />
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => router.push("/new-topic-form")}
+        onPress={() => {
+          if (!user) {
+            Alert.alert(
+              "Connexion requise",
+              "Vous devez être connecté pour créer un topic.",
+            );
+            return;
+          }
+          router.push("/new-topic-form");
+        }}
         activeOpacity={0.8}
       >
         <View style={styles.floatingButtonInner}>

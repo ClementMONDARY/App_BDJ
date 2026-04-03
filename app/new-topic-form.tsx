@@ -1,18 +1,25 @@
+import { ForumAPI } from "@/api/forum";
+import { getAvatarUri, UsersAPI } from "@/api/users";
 import { FormField } from "@/components/form/FormField";
 import { FormMultiImageField } from "@/components/form/FormMultiImageField";
 import { FormSingleImageField } from "@/components/form/FormSingleImageField";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
+import { Icons } from "@/constants/icons";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import type { ThemeColors } from "@/styles";
-import { spacing } from "@/styles";
-import { Feather } from "@expo/vector-icons";
+import { type baseFontSize, fonts, spacing, type ThemeColors } from "@/styles";
+import { Feather, Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
   Alert,
+  Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -33,7 +40,7 @@ const schema = z.object({
   cover_image: z.string().optional(),
   attachment_urls: z
     .array(z.string())
-    .max(5, "Maximum 5 images d'attachment")
+    .max(10, "Maximum 10 images d'attachment")
     .optional(),
 });
 
@@ -41,8 +48,23 @@ type FormData = z.infer<typeof schema>;
 
 export default function NewTopicForm() {
   const { colors } = useTheme();
+  const { user, authenticatedFetch } = useAuth();
   const styles = useThemeStyles(createStyles);
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [activeSection, setActiveSection] = useState<"post" | "images">("post");
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [pendingData, setPendingData] = useState<FormData | null>(null);
+  const [authorAvatar, setAuthorAvatar] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      UsersAPI.getUserPublicInfo(user.id.toString())
+        .then((info) => setAuthorAvatar(info.avatar))
+        .catch(() => {});
+    }
+  }, [user]);
 
   const {
     control,
@@ -63,12 +85,40 @@ export default function NewTopicForm() {
   const contentValue = watch("content", "");
 
   const onSubmit = (data: FormData) => {
-    Alert.alert("Succès", "Topic créé avec succès !");
-    console.log(data);
+    setPendingData(data);
+    setPreviewVisible(true);
   };
+
+  const handleConfirm = async () => {
+    if (!pendingData) return;
+    setIsSubmitting(true);
+    try {
+      await ForumAPI.createTopic(
+        {
+          title: pendingData.title,
+          content: pendingData.content,
+          cover_image: pendingData.cover_image || undefined,
+          attachment_urls: pendingData.attachment_urls,
+        },
+        authenticatedFetch,
+      );
+      await queryClient.invalidateQueries({
+        queryKey: ["forum", "topics", user?.id ?? null],
+      });
+      setPreviewVisible(false);
+      router.replace({ pathname: "/(tabs)/forum", params: { filter: "recent" } });
+    } catch {
+      Alert.alert("Erreur", "Impossible de créer le topic.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const avatarUri = getAvatarUri(authorAvatar);
 
   return (
     <View style={styles.root}>
+      {/* Tab bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity
           style={[
@@ -188,7 +238,7 @@ export default function NewTopicForm() {
                   label="Pièces jointes"
                   value={value || []}
                   onChange={onChange}
-                  maxImages={5}
+                  maxImages={10}
                 />
               )}
             />
@@ -202,11 +252,127 @@ export default function NewTopicForm() {
           onPress={handleSubmit(onSubmit)}
         />
       </View>
+
+      {/* Preview Modal */}
+      <Modal
+        visible={previewVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setPreviewVisible(false)}
+      >
+        <View style={styles.overlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Aperçu du topic</Text>
+
+            <ScrollView
+              style={styles.previewScroll}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.previewCard}>
+                {/* Title + Heart */}
+                <View style={styles.previewTopRow}>
+                  <Text style={styles.previewTitle} numberOfLines={3}>
+                    {pendingData?.title}
+                  </Text>
+                  {Icons.heart({ size: 22, color: colors.iconInactive }, false)}
+                </View>
+
+                {/* Content */}
+                <Text style={styles.previewContent}>
+                  {pendingData?.content}
+                </Text>
+
+                {/* Cover image */}
+                {pendingData?.cover_image ? (
+                  <Image
+                    source={{ uri: pendingData.cover_image }}
+                    style={styles.previewCoverImage}
+                    resizeMode="cover"
+                  />
+                ) : null}
+
+                {/* Attachments */}
+                {pendingData?.attachment_urls &&
+                pendingData.attachment_urls.length > 0 ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.attachmentsContent}
+                  >
+                    {pendingData.attachment_urls.map((uri) => (
+                      <Image
+                        key={uri}
+                        source={{ uri }}
+                        style={styles.attachmentThumbnail}
+                        resizeMode="cover"
+                      />
+                    ))}
+                  </ScrollView>
+                ) : null}
+
+                {/* Bottom row: avatar + stats */}
+                <View style={styles.previewBottomRow}>
+                  <View style={styles.avatarRow}>
+                    {avatarUri ? (
+                      <Image
+                        source={{ uri: avatarUri }}
+                        style={styles.avatar}
+                      />
+                    ) : (
+                      <Ionicons
+                        name="person-circle-outline"
+                        size={30}
+                        color={colors.iconInactive}
+                      />
+                    )}
+                  </View>
+
+                  <View style={styles.counters}>
+                    <View style={styles.counterItem}>
+                      <Feather name="eye" size={18} color={colors.text} />
+                      <Text style={styles.counterText}>0</Text>
+                    </View>
+                    <View style={styles.counterItem}>
+                      <Feather
+                        name="thumbs-up"
+                        size={18}
+                        color={colors.text}
+                      />
+                      <Text style={styles.counterText}>0</Text>
+                    </View>
+                    <View style={styles.counterItem}>
+                      {Icons.message({ size: 18, color: colors.text }, false)}
+                      <Text style={styles.counterText}>0</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </ScrollView>
+
+            {/* Buttons */}
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setPreviewVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Annuler</Text>
+              </TouchableOpacity>
+              <View style={styles.confirmButtonWrapper}>
+                <ThemedButton
+                  title="Confirmer"
+                  onPress={handleConfirm}
+                  loading={isSubmitting}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
 
-const createStyles = (colors: ThemeColors) =>
+const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -250,5 +416,119 @@ const createStyles = (colors: ThemeColors) =>
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.background,
+    },
+    // Modal
+    overlay: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.55)",
+      justifyContent: "flex-end",
+    },
+    modalContainer: {
+      backgroundColor: colors.background,
+      borderTopLeftRadius: 16,
+      borderTopRightRadius: 16,
+      paddingTop: spacing.md,
+      paddingHorizontal: spacing.md,
+      paddingBottom: spacing.xl,
+      maxHeight: "85%",
+    },
+    modalTitle: {
+      fontSize: fontSizes.l,
+      fontFamily: fonts.primaryBold,
+      color: colors.text,
+      marginBottom: spacing.md,
+      textAlign: "center",
+    },
+    previewScroll: {
+      flexGrow: 0,
+    },
+    // Preview card
+    previewCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 8,
+      padding: spacing.sm,
+      gap: spacing.sm,
+    },
+    previewTopRow: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+    },
+    previewTitle: {
+      flex: 1,
+      fontSize: 16,
+      fontFamily: fonts.primaryBold,
+      color: colors.text,
+    },
+    previewContent: {
+      fontSize: fontSizes.xss,
+      fontFamily: fonts.primary,
+      color: colors.text,
+      lineHeight: fontSizes.xss * 1.5,
+    },
+    previewCoverImage: {
+      width: "100%",
+      height: 160,
+      borderRadius: 5,
+    },
+    attachmentsContent: {
+      gap: spacing.sm,
+    },
+    attachmentThumbnail: {
+      width: 80,
+      height: 80,
+      borderRadius: 5,
+    },
+    previewBottomRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: spacing.xs,
+    },
+    avatarRow: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    avatar: {
+      width: 30,
+      height: 30,
+      borderRadius: 15,
+    },
+    counters: {
+      flexDirection: "row",
+      gap: spacing.md,
+    },
+    counterItem: {
+      alignItems: "center",
+      gap: 2,
+    },
+    counterText: {
+      fontFamily: fonts.primary,
+      fontSize: fontSizes.xs,
+      color: colors.text,
+      textAlign: "center",
+    },
+    // Modal buttons
+    modalButtons: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      marginTop: spacing.md,
+    },
+    cancelButton: {
+      flex: 1,
+      height: 48,
+      borderRadius: 10,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    cancelButtonText: {
+      fontSize: fontSizes.m,
+      fontFamily: fonts.primaryBold,
+      color: colors.text,
+    },
+    confirmButtonWrapper: {
+      flex: 1,
     },
   });
