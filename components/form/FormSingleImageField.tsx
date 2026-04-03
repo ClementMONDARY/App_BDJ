@@ -1,6 +1,11 @@
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import type { ThemeColors } from "@/styles";
-import { borderRadius, colors, spacing } from "@/styles";
+import {
+  borderRadius,
+  colors,
+  fonts,
+  spacing,
+  type ThemeColors,
+} from "@/styles";
 import { Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -93,7 +98,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 16,
       fontWeight: "700",
       color: colors.text,
-      fontFamily: "Roboto Mono",
+      fontFamily: fonts.primaryBold,
       marginBottom: 5,
     },
     addButton: {

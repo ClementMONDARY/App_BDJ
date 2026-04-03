@@ -13,7 +13,7 @@ import { type baseFontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -106,7 +106,10 @@ export default function NewTopicForm() {
         queryKey: ["forum", "topics", user?.id ?? null],
       });
       setPreviewVisible(false);
-      router.replace({ pathname: "/(tabs)/forum", params: { filter: "recent" } });
+      router.replace({
+        pathname: "/(tabs)/forum",
+        params: { filter: "recent" },
+      });
     } catch {
       Alert.alert("Erreur", "Impossible de créer le topic.");
     } finally {
@@ -118,6 +121,7 @@ export default function NewTopicForm() {
 
   return (
     <View style={styles.root}>
+      <Stack.Screen options={{ title: "Nouveau Topic" }} />
       {/* Tab bar */}
       <View style={styles.tabBar}>
         <TouchableOpacity
@@ -333,11 +337,7 @@ export default function NewTopicForm() {
                       <Text style={styles.counterText}>0</Text>
                     </View>
                     <View style={styles.counterItem}>
-                      <Feather
-                        name="thumbs-up"
-                        size={18}
-                        color={colors.text}
-                      />
+                      <Feather name="thumbs-up" size={18} color={colors.text} />
                       <Text style={styles.counterText}>0</Text>
                     </View>
                     <View style={styles.counterItem}>

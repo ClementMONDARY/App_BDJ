@@ -1,6 +1,5 @@
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import type { ThemeColors } from "@/styles";
-import { borderRadius, spacing } from "@/styles";
+import { borderRadius, fonts, spacing, type ThemeColors } from "@/styles";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import {
@@ -118,7 +117,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 16,
       fontWeight: "700",
       color: colors.text,
-      fontFamily: "Roboto Mono",
+      fontFamily: fonts.primaryBold,
     },
     counterBadge: {
       paddingHorizontal: 8,
@@ -132,7 +131,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 12,
       fontWeight: "700",
       color: colors.text,
-      fontFamily: "Roboto",
+      fontFamily: fonts.primary,
     },
     imagesContainer: {
       flexDirection: "row",

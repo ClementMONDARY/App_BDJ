@@ -1,6 +1,5 @@
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import type { ThemeColors } from "@/styles";
-import { spacing } from "@/styles";
+import { fonts, spacing, type ThemeColors } from "@/styles";
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 
@@ -54,7 +53,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 16,
       fontWeight: "700",
       color: colors.text,
-      fontFamily: "Roboto Mono",
+      fontFamily: fonts.primaryBold,
     },
     counterBadge: {
       paddingHorizontal: 8,
@@ -68,7 +67,7 @@ const createStyles = (colors: ThemeColors) =>
       fontSize: 12,
       fontWeight: "700",
       color: colors.text,
-      fontFamily: "Roboto",
+      fontFamily: fonts.primary,
     },
     inputWrapper: {
       marginTop: 5,
