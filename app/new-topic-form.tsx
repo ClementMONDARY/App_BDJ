@@ -1,10 +1,12 @@
 import { FormField } from "@/components/form/FormField";
-import { FormImageField } from "@/components/form/FormImageField";
+import { FormMultiImageField } from "@/components/form/FormMultiImageField";
+import { FormSingleImageField } from "@/components/form/FormSingleImageField";
 import { ThemedButton } from "@/components/global/buttons/ThemedButton";
 import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import type { ThemeColors } from "@/styles";
-import { colors, spacing } from "@/styles";
+import { spacing } from "@/styles";
 import { Feather } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
@@ -38,8 +40,8 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function NewTopicForm() {
+  const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
-  const [attachments, setAttachments] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<"post" | "images">("post");
 
   const {
@@ -61,14 +63,8 @@ export default function NewTopicForm() {
   const contentValue = watch("content", "");
 
   const onSubmit = (data: FormData) => {
-    data.attachment_urls = attachments;
     Alert.alert("Succès", "Topic créé avec succès !");
     console.log(data);
-  };
-
-  const handleAttachmentsChange = (uris: string[]) => {
-    const newAttachments = uris.slice(0, 5);
-    setAttachments(newAttachments);
   };
 
   return (
@@ -131,11 +127,9 @@ export default function NewTopicForm() {
         {activeSection === "post" ? (
           <>
             <FormField
-              label={`Titre (${titleValue.length}/64)`}
-              error={
-                errors.title?.message ||
-                (titleValue.length > 64 ? "Titre dépassé." : undefined)
-              }
+              label="Titre"
+              counter={{ current: titleValue.length, max: 64 }}
+              error={errors.title?.message}
             >
               <Controller
                 control={control}
@@ -152,11 +146,9 @@ export default function NewTopicForm() {
             </FormField>
 
             <FormField
-              label={`Contenu (${contentValue.length}/600)`}
-              error={
-                errors.content?.message ||
-                (contentValue.length > 600 ? "Contenu dépassé." : undefined)
-              }
+              label="Contenu"
+              counter={{ current: contentValue.length, max: 600 }}
+              error={errors.content?.message}
             >
               <Controller
                 control={control}
@@ -176,39 +168,30 @@ export default function NewTopicForm() {
           </>
         ) : (
           <>
-            <FormField label="Image de couverture (optionnel)">
-              <Controller
-                control={control}
-                name="cover_image"
-                render={({ field: { onChange, value } }) => (
-                  <FormImageField
-                    label=""
-                    value={value ? [value] : []}
-                    onChange={(uris) => onChange(uris[0] || "")}
-                    placeholder="Sélectionner une image de couverture"
-                    allowsMultiple={false}
-                  />
-                )}
-              />
-            </FormField>
+            <Controller
+              control={control}
+              name="cover_image"
+              render={({ field: { onChange, value } }) => (
+                <FormSingleImageField
+                  label="Image de couverture (optionnel)"
+                  value={value}
+                  onChange={onChange}
+                />
+              )}
+            />
 
-            <FormField
-              label={`Attachement (${attachments.length}/5)`}
-              error={
-                attachments.length > 5
-                  ? "Nombre max d'images d'attachment atteint"
-                  : undefined
-              }
-            >
-              <FormImageField
-                label=""
-                value={attachments}
-                onChange={handleAttachmentsChange}
-                placeholder="Sélectionner des images d'attachment"
-                allowsMultiple={true}
-                maxImages={5}
-              />
-            </FormField>
+            <Controller
+              control={control}
+              name="attachment_urls"
+              render={({ field: { onChange, value } }) => (
+                <FormMultiImageField
+                  label="Pièces jointes"
+                  value={value || []}
+                  onChange={onChange}
+                  maxImages={5}
+                />
+              )}
+            />
           </>
         )}
       </ScrollView>

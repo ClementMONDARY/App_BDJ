@@ -2,25 +2,39 @@ import { useThemeStyles } from "@/hooks/useThemeStyles";
 import type { ThemeColors } from "@/styles";
 import { spacing } from "@/styles";
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, type ViewStyle } from "react-native";
 
 interface FormFieldProps {
   label: string;
   error?: string;
   children: ReactNode;
-  style?: any;
+  style?: ViewStyle;
+  counter?: { current: number; max: number };
 }
 
-export function FormField({ label, error, children, style }: FormFieldProps) {
+export function FormField({
+  label,
+  error,
+  children,
+  style,
+  counter,
+}: FormFieldProps) {
   const styles = useThemeStyles(createStyles);
 
   return (
     <View style={[styles.field, style]}>
-      <View style={styles.labelContainer}>
-        <Text style={styles.label}>{label}</Text>
-        {error && <Text style={styles.errorText}>{error}</Text>}
+      <View style={styles.labelRow}>
+        <Text style={styles.label}>{label.toUpperCase()}</Text>
+        {counter && (
+          <View style={styles.counterBadge}>
+            <Text style={styles.counterText}>
+              {counter.current}/{counter.max}
+            </Text>
+          </View>
+        )}
       </View>
-      {children}
+      {error && <Text style={styles.errorText}>{error}</Text>}
+      <View style={styles.inputWrapper}>{children}</View>
     </View>
   );
 }
@@ -30,19 +44,38 @@ const createStyles = (colors: ThemeColors) =>
     field: {
       marginBottom: spacing.lg,
     },
-    labelContainer: {
+    labelRow: {
       flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.sm,
+      alignItems: "flex-end",
+      gap: 10,
+      marginBottom: 5,
     },
     label: {
       fontSize: 16,
-      fontWeight: "bold",
+      fontWeight: "700",
       color: colors.text,
-      marginBottom: spacing.sm,
+      fontFamily: "Roboto Mono",
+    },
+    counterBadge: {
+      paddingHorizontal: 8,
+      paddingVertical: 3,
+      backgroundColor: colors.border,
+      borderRadius: 5,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    counterText: {
+      fontSize: 12,
+      fontWeight: "700",
+      color: colors.text,
+      fontFamily: "Roboto",
+    },
+    inputWrapper: {
+      marginTop: 5,
     },
     errorText: {
       color: colors.error,
       fontSize: 14,
+      marginTop: spacing.sm,
     },
   });
