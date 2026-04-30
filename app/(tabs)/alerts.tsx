@@ -132,8 +132,6 @@ export default function Alerts() {
         paddingBottom: spacing["3xl"],
       }}
     >
-      -- No style=common.mainContentContainer because of the FlatList overflow
-      issue --
       <FlatList
         data={filteredNotifications}
         contentContainerStyle={styles.listContent}

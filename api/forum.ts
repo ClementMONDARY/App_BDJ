@@ -30,10 +30,44 @@ export const ZCreateTopicInput = z.object({
   attachment_urls: z.array(z.string()).max(5).optional(),
 });
 
+export const ZPost = z.object({
+  id: z.number().int(),
+  topic_id: z.number().int(),
+  author_id: z.number().int().nullable(),
+  content: z.string(),
+  parent_id: z.number().int().nullable(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+});
+
+export const ZPostWithResponses = ZPost.extend({
+  responses: z.array(ZPost).default([]),
+});
+
+export const ZTopicPostsResponse = z.array(ZPost);
+
+export const ZCreatePostInput = z.object({
+  content: z.string().min(1),
+  parent_id: z.number().int().optional(),
+});
+
 export type Topic = z.infer<typeof ZTopic>;
 export type TopicList = z.infer<typeof ZTopicList>;
 export type TopicMessagersResponse = z.infer<typeof ZTopicMessagersResponse>;
 export type CreateTopicInput = z.infer<typeof ZCreateTopicInput>;
+export type Post = z.infer<typeof ZPost>;
+export type PostWithResponses = z.infer<typeof ZPostWithResponses>;
+export type CreatePostInput = z.infer<typeof ZCreatePostInput>;
+
+// --- Helpers ---
+
+export function groupPostsWithResponses(posts: Post[]): PostWithResponses[] {
+  const topLevel = posts.filter((p) => p.parent_id === null);
+  return topLevel.map((post) => ({
+    ...post,
+    responses: posts.filter((p) => p.parent_id === post.id),
+  }));
+}
 
 // --- API ---
 
@@ -116,6 +150,79 @@ export const ForumAPI = {
 
     if (!response.ok) {
       throw new Error("Failed to create topic");
+    }
+  },
+
+  /**
+   * GET /forum/topics/:id (Public)
+   * Fetch a single topic by id. Also increments view_count server-side.
+   */
+  fetchTopicById: async (
+    topicId: number,
+    fetcher?: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Topic> => {
+    const doFetch = fetcher ?? fetch;
+    const response = await doFetch(
+      `${CONFIG.API_URL}/forum/topics/${topicId}`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch topic ${topicId}`);
+    }
+
+    const data = await response.json();
+    return ZTopic.parse(data);
+  },
+
+  /**
+   * GET /forum/topics/:id/posts (Public)
+   * Fetch all top-level posts for a topic, each with their nested responses.
+   */
+  getTopicPosts: async (
+    topicId: number,
+    fetcher?: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Post[]> => {
+    const doFetch = fetcher ?? fetch;
+    const response = await doFetch(
+      `${CONFIG.API_URL}/forum/topics/${topicId}/posts`,
+      {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch posts for topic ${topicId}`);
+    }
+
+    const data = await response.json();
+    return ZTopicPostsResponse.parse(data);
+  },
+
+  /**
+   * POST /forum/topics/:id/posts (Connected)
+   * Create a new post or reply under a topic.
+   */
+  createPost: async (
+    topicId: number,
+    input: CreatePostInput,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
+    const response = await fetcher(
+      `${CONFIG.API_URL}/forum/topics/${topicId}/posts`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to create post for topic ${topicId}`);
     }
   },
 };
