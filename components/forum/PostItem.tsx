@@ -1,8 +1,8 @@
-import { type Post } from "@/api/forum";
-import { getAvatarUri, UsersAPI } from "@/api/users";
+import type { Post } from "@/api/forum";
+import { UsersAPI, getAvatarUri } from "@/api/users";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
-import { fonts, type ThemeColors, type baseFontSize } from "@/styles";
+import { type baseFontSize, fonts, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
@@ -11,7 +11,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 interface PostItemProps {
   post: Post;
-  onReply: (postId: number) => void;
+  onReply: (postId: number, authorId: number | null, username?: string) => void;
 }
 
 // --- Helpers ---
@@ -31,7 +31,7 @@ export function PostItem({ post, onReply }: PostItemProps) {
 
   const { data: author } = useQuery({
     queryKey: ["users", post.author_id],
-    queryFn: () => UsersAPI.getUserPublicInfo(post.author_id!.toString()),
+    queryFn: () => UsersAPI.getUserPublicInfo(String(post.author_id)),
     enabled: post.author_id !== null,
   });
 
@@ -63,7 +63,7 @@ export function PostItem({ post, onReply }: PostItemProps) {
           <Text style={styles.timestamp}>{formatPostDate(post.created_at)}</Text>
         </View>
         <Text style={styles.body}>{post.content}</Text>
-        <Pressable onPress={() => onReply(post.id)} hitSlop={8}>
+        <Pressable onPress={() => onReply(post.id, post.author_id, author?.username)} hitSlop={8}>
           <Text style={styles.reply}>Reply</Text>
         </Pressable>
       </View>

@@ -40,7 +40,10 @@ export default function TopicDetailPage() {
   const styles = useThemeStyles(createStyles);
   const queryClient = useQueryClient();
   const [fullscreenUri, setFullscreenUri] = useState<string | null>(null);
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyingTo, setReplyingTo] = useState<{
+    postId: number;
+    authorId: number | null;
+  } | null>(null);
   const [commentText, setCommentText] = useState("");
   const [replyText, setReplyText] = useState("");
   const [participantAvatars, setParticipantAvatars] = useState<
@@ -69,6 +72,12 @@ export default function TopicDetailPage() {
   });
 
   const groupedPosts = groupPostsWithResponses(postsData ?? []);
+
+  const { data: replyTargetAuthor } = useQuery({
+    queryKey: ["users", replyingTo?.authorId],
+    queryFn: () => UsersAPI.getUserPublicInfo(String(replyingTo?.authorId)),
+    enabled: replyingTo?.authorId != null,
+  });
 
   // Avatar stack logic (mirrors TopicCard)
   const messagerIds = messagersData?.users_ids ?? [];
@@ -148,9 +157,13 @@ export default function TopicDetailPage() {
     },
   });
 
-  const handleReply = (postId: number) => {
-    setReplyingTo(postId);
-    setReplyText("");
+  const handleReply = (
+    postId: number,
+    authorId: number | null,
+    username?: string,
+  ) => {
+    setReplyingTo({ postId, authorId });
+    setReplyText(username ? `@${username} ` : "");
   };
 
   const handleSubmitComment = () => {
@@ -174,7 +187,7 @@ export default function TopicDetailPage() {
     if (!replyText.trim() || replyingTo === null) return;
     createPostMutation.mutate({
       content: replyText.trim(),
-      parent_id: replyingTo,
+      parent_id: replyingTo.postId,
     });
   };
 
@@ -376,8 +389,8 @@ export default function TopicDetailPage() {
           {/* Posts */}
           {groupedPosts.map((post) => {
             const isReplyingToGroup =
-              replyingTo === post.id ||
-              post.responses.some((r) => r.id === replyingTo);
+              replyingTo?.postId === post.id ||
+              post.responses.some((r) => r.id === replyingTo?.postId);
             return (
               <View key={post.id} style={styles.postGroup}>
                 <PostItem post={post} onReply={handleReply} />
@@ -390,27 +403,30 @@ export default function TopicDetailPage() {
                       style={{ marginTop: 2 }}
                     />
                     <View style={styles.responsesContainer}>
-                      {post.responses.map((response) => {
-                        const isDirectReply = response.parent_id === post.id;
-                        const parentAuthorId = isDirectReply
-                          ? null
-                          : post.responses.find(
-                              (r) => r.id === response.parent_id,
-                            )?.author_id ?? null;
-                        return (
-                          <PostResponseItem
-                            key={response.id}
-                            post={response}
-                            onReply={handleReply}
-                            parentAuthorId={parentAuthorId}
-                          />
-                        );
-                      })}
+                      {post.responses.map((response) => (
+                        <PostResponseItem
+                          key={response.id}
+                          post={response}
+                          onReply={handleReply}
+                        />
+                      ))}
                     </View>
                   </View>
                 )}
                 {isReplyingToGroup && (
                   <View style={styles.replyInputContainer}>
+                    <View style={styles.replyBanner}>
+                      <View style={styles.replyBannerAccent} />
+                      <Text style={styles.replyBannerText}>
+                        Répondre à{" "}
+                        <Text style={styles.replyBannerUsername}>
+                          @{replyTargetAuthor?.username ?? "..."}
+                        </Text>
+                      </Text>
+                      <Pressable onPress={() => setReplyingTo(null)} hitSlop={8}>
+                        <Feather name="x" size={14} color={colors.textSecondary} />
+                      </Pressable>
+                    </View>
                     <ThemedTextInput
                       value={replyText}
                       onChangeText={setReplyText}
@@ -420,12 +436,6 @@ export default function TopicDetailPage() {
                       autoFocus
                     />
                     <View style={styles.replyActions}>
-                      <Pressable
-                        onPress={() => setReplyingTo(null)}
-                        hitSlop={8}
-                      >
-                        <Text style={styles.cancelText}>Annuler</Text>
-                      </Pressable>
                       <Pressable
                         onPress={handleSubmitReply}
                         disabled={createPostMutation.isPending}
@@ -601,16 +611,34 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     replyInputContainer: {
       gap: spacing.xs,
     },
-    replyActions: {
+    replyBanner: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      paddingHorizontal: spacing.xs,
+      backgroundColor: colors.surface,
+      borderRadius: borderRadius.s,
+      paddingVertical: spacing.xs,
+      paddingHorizontal: spacing.sm,
+      gap: spacing.sm,
     },
-    cancelText: {
+    replyBannerAccent: {
+      width: 3,
+      alignSelf: "stretch",
+      backgroundColor: colors.primary,
+      borderRadius: 2,
+    },
+    replyBannerText: {
+      flex: 1,
       fontFamily: fonts.primary,
       fontSize: fontSizes.xss,
       color: colors.textSecondary,
+    },
+    replyBannerUsername: {
+      fontFamily: fonts.primaryBold,
+      color: colors.primary,
+    },
+    replyActions: {
+      alignItems: "flex-end",
+      paddingHorizontal: spacing.xs,
     },
     // Fullscreen viewer
     fullscreenOverlay: {
