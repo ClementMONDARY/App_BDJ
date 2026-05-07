@@ -17,18 +17,24 @@ import {
 import { Feather, Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Image,
+  Keyboard,
   Modal,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
+import {
+  KeyboardEvents,
+  KeyboardStickyView,
+} from "react-native-keyboard-controller";
 
 const MAX_AVATARS = 5;
 
@@ -49,6 +55,38 @@ export default function TopicDetailPage() {
   const [participantAvatars, setParticipantAvatars] = useState<
     Record<number, string | null>
   >({});
+
+  // Floating reply bar (TikTok-style):
+  // - <KeyboardStickyView> handles positioning above the keyboard frame-perfect
+  //   using native WindowInsets (incl. the suggestion strip on Android).
+  // - KeyboardEvents.keyboardDidHide listens on the JS thread and clears the
+  //   reply state when the keyboard finishes closing — this hides the bar
+  //   without relying on worklets / runOnJS.
+  const replyInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!replyingTo) return;
+    const sub = KeyboardEvents.addListener("keyboardDidHide", () => {
+      setReplyingTo(null);
+      setReplyText("");
+    });
+    return () => sub.remove();
+  }, [replyingTo]);
+
+  // Auto-focus the floating input when a reply target is set, so the keyboard
+  // opens automatically.
+  useEffect(() => {
+    if (replyingTo) {
+      const t = setTimeout(() => replyInputRef.current?.focus(), 50);
+      return () => clearTimeout(t);
+    }
+  }, [replyingTo]);
+
+  // Cross button: dismiss the keyboard. The keyboardDidHide listener above
+  // will then clear the reply state, keeping a single source of truth.
+  const handleCloseReply = () => {
+    Keyboard.dismiss();
+  };
 
   const {
     data: topic,
@@ -144,13 +182,16 @@ export default function TopicDetailPage() {
   const createPostMutation = useMutation({
     mutationFn: (input: { content: string; parent_id?: number }) =>
       ForumAPI.createPost(topicId, input, authenticatedFetch),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["forum", "topic", topicId, "posts"],
       });
-      setCommentText("");
-      setReplyText("");
-      setReplyingTo(null);
+      if (variables.parent_id != null) {
+        // Reply submission: dismiss keyboard; keyboardDidHide listener clears state.
+        Keyboard.dismiss();
+      } else {
+        setCommentText("");
+      }
     },
     onError: () => {
       Alert.alert("Erreur", "Impossible d'envoyer votre message.");
@@ -388,9 +429,6 @@ export default function TopicDetailPage() {
 
           {/* Posts */}
           {groupedPosts.map((post) => {
-            const isReplyingToGroup =
-              replyingTo?.postId === post.id ||
-              post.responses.some((r) => r.id === replyingTo?.postId);
             return (
               <View key={post.id} style={styles.postGroup}>
                 <PostItem post={post} onReply={handleReply} />
@@ -413,48 +451,51 @@ export default function TopicDetailPage() {
                     </View>
                   </View>
                 )}
-                {isReplyingToGroup && (
-                  <View style={styles.replyInputContainer}>
-                    <View style={styles.replyBanner}>
-                      <View style={styles.replyBannerAccent} />
-                      <Text style={styles.replyBannerText}>
-                        Répondre à{" "}
-                        <Text style={styles.replyBannerUsername}>
-                          @{replyTargetAuthor?.username ?? "..."}
-                        </Text>
-                      </Text>
-                      <Pressable onPress={() => setReplyingTo(null)} hitSlop={8}>
-                        <Feather name="x" size={14} color={colors.textSecondary} />
-                      </Pressable>
-                    </View>
-                    <ThemedTextInput
-                      value={replyText}
-                      onChangeText={setReplyText}
-                      placeholder="Votre réponse..."
-                      returnKeyType="send"
-                      onSubmitEditing={handleSubmitReply}
-                      autoFocus
-                    />
-                    <View style={styles.replyActions}>
-                      <Pressable
-                        onPress={handleSubmitReply}
-                        disabled={createPostMutation.isPending}
-                        hitSlop={8}
-                      >
-                        {createPostMutation.isPending ? (
-                          <ActivityIndicator size="small" color={colors.primary} />
-                        ) : (
-                          <Feather name="send" size={16} color={colors.primary} />
-                        )}
-                      </Pressable>
-                    </View>
-                  </View>
-                )}
               </View>
             );
           })}
         </View>
       </ScrollView>
+
+      {/* ── Floating reply bar (TikTok-style) ── */}
+      {replyingTo !== null && (
+        <KeyboardStickyView style={styles.floatingReplyBar}>
+          <View style={styles.replyBanner}>
+            <View style={styles.replyBannerAccent} />
+            <Text style={styles.replyBannerText}>
+              Répondre à{" "}
+              <Text style={styles.replyBannerUsername}>
+                @{replyTargetAuthor?.username ?? "..."}
+              </Text>
+            </Text>
+            <Pressable onPress={handleCloseReply} hitSlop={8}>
+              <Feather name="x" size={14} color={colors.textSecondary} />
+            </Pressable>
+          </View>
+          <View style={styles.floatingReplyInputRow}>
+            <ThemedTextInput
+              ref={replyInputRef}
+              value={replyText}
+              onChangeText={setReplyText}
+              placeholder="Votre réponse..."
+              returnKeyType="send"
+              onSubmitEditing={handleSubmitReply}
+              containerStyle={{ flex: 1 }}
+            />
+            <Pressable
+              onPress={handleSubmitReply}
+              disabled={createPostMutation.isPending}
+              style={styles.sendButton}
+            >
+              {createPostMutation.isPending ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Feather name="send" size={16} color={colors.white} />
+              )}
+            </Pressable>
+          </View>
+        </KeyboardStickyView>
+      )}
 
       {/* Fullscreen image viewer */}
       <Modal
@@ -608,9 +649,6 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       flex: 1,
       gap: spacing.sm,
     },
-    replyInputContainer: {
-      gap: spacing.xs,
-    },
     replyBanner: {
       flexDirection: "row",
       alignItems: "center",
@@ -636,9 +674,21 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       fontFamily: fonts.primaryBold,
       color: colors.primary,
     },
-    replyActions: {
-      alignItems: "flex-end",
-      paddingHorizontal: spacing.xs,
+    // Floating reply bar (TikTok-style). KeyboardStickyView handles vertical
+    // positioning above the keyboard automatically.
+    floatingReplyBar: {
+      backgroundColor: colors.background,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.sm,
+      gap: spacing.xs,
+    },
+    floatingReplyInputRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+      paddingBottom: spacing.sm,
     },
     // Fullscreen viewer
     fullscreenOverlay: {

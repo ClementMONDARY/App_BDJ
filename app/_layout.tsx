@@ -13,6 +13,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { KeyboardProvider } from "react-native-keyboard-controller";
 
 const queryClient = new QueryClient();
 
@@ -45,23 +46,25 @@ export default function RootLayout() {
         <ThemeProvider>
           <AuthProvider>
             <ThemedRoot>
-              <StatusBar style="auto" />
-              <Stack
-                screenOptions={{
-                  header: (props) => <Header {...props} />,
-                }}
-              >
-                <Stack.Screen
-                  name="(tabs)"
-                  options={{
-                    headerShown: false,
+              <KeyboardProvider>
+                <StatusBar style="auto" />
+                <Stack
+                  screenOptions={{
+                    header: (props) => <Header {...props} />,
                   }}
-                />
-                <Stack.Screen
-                  name="+not-found"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
+                >
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="+not-found"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </KeyboardProvider>
             </ThemedRoot>
           </AuthProvider>
         </ThemeProvider>
