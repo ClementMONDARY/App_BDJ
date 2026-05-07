@@ -1,6 +1,7 @@
 import { ForumAPI, groupPostsWithResponses, type Topic } from "@/api/forum";
 import { PostItem } from "@/components/forum/PostItem";
 import { PostResponseItem } from "@/components/forum/PostResponseItem";
+import { ThemedTextInput } from "@/components/global/inputs/ThemedTextInput";
 import { getAvatarUri, UsersAPI } from "@/api/users";
 import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,6 +40,8 @@ export default function TopicDetailPage() {
   const queryClient = useQueryClient();
   const [fullscreenUri, setFullscreenUri] = useState<string | null>(null);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [commentText, setCommentText] = useState("");
+  const [replyText, setReplyText] = useState("");
   const [participantAvatars, setParticipantAvatars] = useState<
     Record<number, string | null>
   >({});
@@ -127,6 +130,52 @@ export default function TopicDetailPage() {
       queryClient.invalidateQueries({ queryKey: topicsListKey });
     },
   });
+
+  const createPostMutation = useMutation({
+    mutationFn: (input: { content: string; parent_id?: number }) =>
+      ForumAPI.createPost(topicId, input, authenticatedFetch),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum", "topic", topicId, "posts"],
+      });
+      setCommentText("");
+      setReplyText("");
+      setReplyingTo(null);
+    },
+    onError: () => {
+      Alert.alert("Erreur", "Impossible d'envoyer votre message.");
+    },
+  });
+
+  const handleReply = (postId: number) => {
+    setReplyingTo(postId);
+    setReplyText("");
+  };
+
+  const handleSubmitComment = () => {
+    if (!user) {
+      Alert.alert("Connexion requise", "Connectez-vous pour commenter.", [
+        { text: "OK" },
+      ]);
+      return;
+    }
+    if (!commentText.trim()) return;
+    createPostMutation.mutate({ content: commentText.trim() });
+  };
+
+  const handleSubmitReply = () => {
+    if (!user) {
+      Alert.alert("Connexion requise", "Connectez-vous pour répondre.", [
+        { text: "OK" },
+      ]);
+      return;
+    }
+    if (!replyText.trim() || replyingTo === null) return;
+    createPostMutation.mutate({
+      content: replyText.trim(),
+      parent_id: replyingTo,
+    });
+  };
 
   const handleFollow = () => {
     if (!user) {
@@ -295,24 +344,79 @@ export default function TopicDetailPage() {
           </View>
         </View>
 
+        {/* ── Separator ── */}
+        <View style={styles.separator} />
+
         {/* ── Comments section ── */}
         <View style={styles.commentsSection}>
-          {groupedPosts.map((post) => (
-            <View key={post.id} style={styles.postGroup}>
-              <PostItem post={post} onReply={setReplyingTo} />
-              {post.responses.length > 0 && (
-                <View style={styles.responsesContainer}>
-                  {post.responses.map((response) => (
-                    <PostResponseItem
-                      key={response.id}
-                      post={response}
-                      onReply={setReplyingTo}
+          {/* Main comment input */}
+          <View style={styles.commentInputRow}>
+            <ThemedTextInput
+              value={commentText}
+              onChangeText={setCommentText}
+              placeholder={`Commenter sous "${topic.title}"`}
+              containerStyle={{ flex: 1 }}
+              returnKeyType="send"
+              onSubmitEditing={handleSubmitComment}
+            />
+            <Pressable
+              onPress={handleSubmitComment}
+              disabled={createPostMutation.isPending}
+              style={styles.sendButton}
+            >
+              <Feather name="send" size={16} color={colors.white} />
+            </Pressable>
+          </View>
+
+          {/* Posts */}
+          {groupedPosts.map((post) => {
+            const isReplyingToGroup =
+              replyingTo === post.id ||
+              post.responses.some((r) => r.id === replyingTo);
+            return (
+              <View key={post.id} style={styles.postGroup}>
+                <PostItem post={post} onReply={handleReply} />
+                {post.responses.length > 0 && (
+                  <View style={styles.responsesContainer}>
+                    {post.responses.map((response) => (
+                      <PostResponseItem
+                        key={response.id}
+                        post={response}
+                        onReply={handleReply}
+                      />
+                    ))}
+                  </View>
+                )}
+                {isReplyingToGroup && (
+                  <View style={styles.replyInputContainer}>
+                    <ThemedTextInput
+                      value={replyText}
+                      onChangeText={setReplyText}
+                      placeholder="Votre réponse..."
+                      returnKeyType="send"
+                      onSubmitEditing={handleSubmitReply}
+                      autoFocus
                     />
-                  ))}
-                </View>
-              )}
-            </View>
-          ))}
+                    <View style={styles.replyActions}>
+                      <Pressable
+                        onPress={() => setReplyingTo(null)}
+                        hitSlop={8}
+                      >
+                        <Text style={styles.cancelText}>Annuler</Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={handleSubmitReply}
+                        disabled={createPostMutation.isPending}
+                        hitSlop={8}
+                      >
+                        <Feather name="send" size={16} color={colors.primary} />
+                      </Pressable>
+                    </View>
+                  </View>
+                )}
+              </View>
+            );
+          })}
         </View>
       </ScrollView>
 
@@ -435,9 +539,25 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       textAlign: "center",
     },
     // Comments section
+    separator: {
+      height: 1,
+      backgroundColor: colors.border,
+    },
     commentsSection: {
-      marginTop: spacing.sm,
       gap: spacing.md,
+    },
+    commentInputRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.sm,
+    },
+    sendButton: {
+      width: 38,
+      height: 38,
+      borderRadius: 19,
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
     },
     postGroup: {
       gap: spacing.sm,
@@ -445,6 +565,20 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     responsesContainer: {
       paddingLeft: 50,
       gap: spacing.sm,
+    },
+    replyInputContainer: {
+      gap: spacing.xs,
+    },
+    replyActions: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: spacing.xs,
+    },
+    cancelText: {
+      fontFamily: fonts.primary,
+      fontSize: fontSizes.xss,
+      color: colors.textSecondary,
     },
     // Fullscreen viewer
     fullscreenOverlay: {
