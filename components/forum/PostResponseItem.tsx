@@ -12,6 +12,7 @@ import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 interface PostResponseItemProps {
   post: Post;
   onReply: (postId: number) => void;
+  parentAuthorId?: number | null;
 }
 
 // --- Helpers ---
@@ -25,7 +26,11 @@ function formatPostDate(date: Date): string {
 
 // --- Component ---
 
-export function PostResponseItem({ post, onReply }: PostResponseItemProps) {
+export function PostResponseItem({
+  post,
+  onReply,
+  parentAuthorId,
+}: PostResponseItemProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
 
@@ -33,6 +38,12 @@ export function PostResponseItem({ post, onReply }: PostResponseItemProps) {
     queryKey: ["users", post.author_id],
     queryFn: () => UsersAPI.getUserPublicInfo(post.author_id!.toString()),
     enabled: post.author_id !== null,
+  });
+
+  const { data: parentAuthor } = useQuery({
+    queryKey: ["users", parentAuthorId],
+    queryFn: () => UsersAPI.getUserPublicInfo(parentAuthorId!.toString()),
+    enabled: parentAuthorId != null,
   });
 
   const avatarUri = getAvatarUri(author?.avatar ?? null);
@@ -62,7 +73,12 @@ export function PostResponseItem({ post, onReply }: PostResponseItemProps) {
           <Text style={styles.username}>{author?.username ?? "..."}</Text>
           <Text style={styles.timestamp}>{formatPostDate(post.created_at)}</Text>
         </View>
-        <Text style={styles.body}>{post.content}</Text>
+        <Text style={styles.body}>
+          {parentAuthor && (
+            <Text style={styles.mention}>@{parentAuthor.username}{" "}</Text>
+          )}
+          {post.content}
+        </Text>
         <Pressable onPress={() => onReply(post.id)} hitSlop={8}>
           <Text style={styles.reply}>Reply</Text>
         </Pressable>
@@ -112,6 +128,11 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       fontFamily: fonts.primary,
       fontSize: fontSizes.xss,
       color: colors.text,
+    },
+    mention: {
+      fontFamily: fonts.primaryBold,
+      fontSize: fontSizes.xss,
+      color: colors.primary,
     },
     reply: {
       fontFamily: fonts.primaryBold,

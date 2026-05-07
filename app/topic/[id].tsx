@@ -19,6 +19,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Modal,
@@ -364,7 +365,11 @@ export default function TopicDetailPage() {
               disabled={createPostMutation.isPending}
               style={styles.sendButton}
             >
-              <Feather name="send" size={16} color={colors.white} />
+              {createPostMutation.isPending ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <Feather name="send" size={16} color={colors.white} />
+              )}
             </Pressable>
           </View>
 
@@ -377,14 +382,31 @@ export default function TopicDetailPage() {
               <View key={post.id} style={styles.postGroup}>
                 <PostItem post={post} onReply={handleReply} />
                 {post.responses.length > 0 && (
-                  <View style={styles.responsesContainer}>
-                    {post.responses.map((response) => (
-                      <PostResponseItem
-                        key={response.id}
-                        post={response}
-                        onReply={handleReply}
-                      />
-                    ))}
+                  <View style={styles.responsesWrapper}>
+                    <Feather
+                      name="corner-down-right"
+                      size={18}
+                      color={colors.iconInactive}
+                      style={{ marginTop: 2 }}
+                    />
+                    <View style={styles.responsesContainer}>
+                      {post.responses.map((response) => {
+                        const isDirectReply = response.parent_id === post.id;
+                        const parentAuthorId = isDirectReply
+                          ? null
+                          : post.responses.find(
+                              (r) => r.id === response.parent_id,
+                            )?.author_id ?? null;
+                        return (
+                          <PostResponseItem
+                            key={response.id}
+                            post={response}
+                            onReply={handleReply}
+                            parentAuthorId={parentAuthorId}
+                          />
+                        );
+                      })}
+                    </View>
                   </View>
                 )}
                 {isReplyingToGroup && (
@@ -409,7 +431,11 @@ export default function TopicDetailPage() {
                         disabled={createPostMutation.isPending}
                         hitSlop={8}
                       >
-                        <Feather name="send" size={16} color={colors.primary} />
+                        {createPostMutation.isPending ? (
+                          <ActivityIndicator size="small" color={colors.primary} />
+                        ) : (
+                          <Feather name="send" size={16} color={colors.primary} />
+                        )}
                       </Pressable>
                     </View>
                   </View>
@@ -562,8 +588,14 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     postGroup: {
       gap: spacing.sm,
     },
-    responsesContainer: {
+    responsesWrapper: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
       paddingLeft: 50,
+    },
+    responsesContainer: {
+      flex: 1,
       gap: spacing.sm,
     },
     replyInputContainer: {
