@@ -1,4 +1,6 @@
-import { ForumAPI, type Topic } from "@/api/forum";
+import { ForumAPI, groupPostsWithResponses, type Topic } from "@/api/forum";
+import { PostItem } from "@/components/forum/PostItem";
+import { PostResponseItem } from "@/components/forum/PostResponseItem";
 import { getAvatarUri, UsersAPI } from "@/api/users";
 import { Icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/AuthContext";
@@ -36,6 +38,7 @@ export default function TopicDetailPage() {
   const styles = useThemeStyles(createStyles);
   const queryClient = useQueryClient();
   const [fullscreenUri, setFullscreenUri] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [participantAvatars, setParticipantAvatars] = useState<
     Record<number, string | null>
   >({});
@@ -54,6 +57,14 @@ export default function TopicDetailPage() {
     queryFn: () => ForumAPI.fetchTopicMessagers(topicId),
     enabled: !!topic,
   });
+
+  const { data: postsData } = useQuery({
+    queryKey: ["forum", "topic", topicId, "posts"],
+    queryFn: () => ForumAPI.getTopicPosts(topicId),
+    enabled: !!topic,
+  });
+
+  const groupedPosts = groupPostsWithResponses(postsData ?? []);
 
   // Avatar stack logic (mirrors TopicCard)
   const messagerIds = messagersData?.users_ids ?? [];
@@ -284,8 +295,25 @@ export default function TopicDetailPage() {
           </View>
         </View>
 
-        {/* ── Comments section (à implémenter) ── */}
-        <View style={styles.commentsSection} />
+        {/* ── Comments section ── */}
+        <View style={styles.commentsSection}>
+          {groupedPosts.map((post) => (
+            <View key={post.id} style={styles.postGroup}>
+              <PostItem post={post} onReply={setReplyingTo} />
+              {post.responses.length > 0 && (
+                <View style={styles.responsesContainer}>
+                  {post.responses.map((response) => (
+                    <PostResponseItem
+                      key={response.id}
+                      post={response}
+                      onReply={setReplyingTo}
+                    />
+                  ))}
+                </View>
+              )}
+            </View>
+          ))}
+        </View>
       </ScrollView>
 
       {/* Fullscreen image viewer */}
@@ -406,9 +434,17 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       color: colors.text,
       textAlign: "center",
     },
-    // Comments placeholder
+    // Comments section
     commentsSection: {
       marginTop: spacing.sm,
+      gap: spacing.md,
+    },
+    postGroup: {
+      gap: spacing.sm,
+    },
+    responsesContainer: {
+      paddingLeft: 50,
+      gap: spacing.sm,
     },
     // Fullscreen viewer
     fullscreenOverlay: {
