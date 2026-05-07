@@ -63,10 +63,23 @@ export type CreatePostInput = z.infer<typeof ZCreatePostInput>;
 
 export function groupPostsWithResponses(posts: Post[]): PostWithResponses[] {
   const topLevel = posts.filter((p) => p.parent_id === null);
-  return topLevel.map((post) => ({
-    ...post,
-    responses: posts.filter((p) => p.parent_id === post.id),
-  }));
+
+  return topLevel.map((post) => {
+    const descendants: Post[] = [];
+    const queue = [post.id];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift();
+      if (currentId === undefined) break;
+      const children = posts.filter((p) => p.parent_id === currentId);
+      descendants.push(...children);
+      queue.push(...children.map((c) => c.id));
+    }
+
+    descendants.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
+
+    return { ...post, responses: descendants };
+  });
 }
 
 // --- API ---
