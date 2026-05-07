@@ -14,6 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -241,8 +242,11 @@ export function TopicCard({ topic }: TopicCardProps) {
           </View>
         </View>
 
-        {/* CTA button (Discuss) — no link yet */}
-        <Pressable style={styles.ctaButton}>
+        {/* CTA button (Discuss) */}
+        <Pressable
+          style={styles.ctaButton}
+          onPress={() => router.push(`/topic/${topic.id}`)}
+        >
           {Icons["topic-details"]({ size: 18, color: colors.white })}
         </Pressable>
       </View>

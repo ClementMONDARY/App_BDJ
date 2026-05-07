@@ -185,7 +185,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     },
     listContent: {
       padding: spacing.sm,
-      paddingBottom: spacing["2xl"],
+      paddingBottom: 200,
     },
     separator: {
       height: spacing.sm,
