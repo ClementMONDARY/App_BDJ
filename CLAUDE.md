@@ -285,6 +285,14 @@ export function MyForm() {
 
 ---
 
+## 🧰 Shared Utilities (`/services`)
+
+### Date formatting
+- **`formatDate(date: Date): string`** — Formats a Date to `DD/MM/YYYY`. Import from `@/services/dateUtils`.
+- Use it anywhere a date needs to be displayed to the user (event cards, detail pages, etc.).
+
+---
+
 ## 📝 Coding Standards
 - **Naming**: PascalCase for Components, camelCase for variables/functions.
 - **Imports**: Use absolute imports `@/...` where possible (configured in `tsconfig.json`).
