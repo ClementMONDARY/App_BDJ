@@ -10,6 +10,7 @@ const palette = {
   darkInput: "#454545", // Slightly lighter than surface for inputs
   primary: "#257A83",
   primaryDark: "#1A555B",
+  success: "#39B300",
   error: "#CD0000",
   warning: "#E8A302",
 };
