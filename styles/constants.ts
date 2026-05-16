@@ -1,5 +1,5 @@
 // Palette de base fournie par l'utilisateur
-const palette = {
+export const palette = {
   white: "#FFFFFF",
   black: "#1E1E1E", // Darkest in both
   greyLight: "#F5F5F5", // Light BG

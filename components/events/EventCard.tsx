@@ -5,9 +5,12 @@ import {
   type baseFontSize,
   borderRadius,
   fonts,
+  palette,
   shadows,
+  spacing,
   type ThemeColors,
 } from "@/styles";
+import { formatDate } from "@/services/dateUtils";
 import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
@@ -18,20 +21,6 @@ interface EventCardProps {
 }
 
 type EventStatus = "open" | "registered" | "closed";
-
-// --- Constants ---
-
-const SUCCESS_COLOR = "#39B300";
-const WARNING_COLOR = "#E8A302";
-
-// --- Helpers ---
-
-function formatDate(date: Date): string {
-  const dd = String(date.getDate()).padStart(2, "0");
-  const mm = String(date.getMonth() + 1).padStart(2, "0");
-  const yyyy = date.getFullYear();
-  return `${dd}/${mm}/${yyyy}`;
-}
 
 function getEventStatus(event: Event): EventStatus {
   if (event.is_registered) return "registered";
@@ -50,11 +39,11 @@ function getPlacesColor(
   max: number | null,
   errorColor: string,
 ): string {
-  if (max === null) return SUCCESS_COLOR;
+  if (max === null) return palette.success;
   if (current >= max) return errorColor;
   const remaining = max - current;
-  if (remaining / max < 0.5) return WARNING_COLOR;
-  return SUCCESS_COLOR;
+  if (remaining / max < 0.5) return palette.warning;
+  return palette.success;
 }
 
 // --- Component ---
@@ -72,7 +61,7 @@ export function EventCard({ event }: EventCardProps) {
 
   const ctaBackgroundColor =
     status === "registered"
-      ? SUCCESS_COLOR
+      ? palette.success
       : status === "closed"
         ? colors.iconInactive
         : colors.primary;
@@ -140,6 +129,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
   StyleSheet.create({
     card: {
       flexDirection: "row",
+      gap: spacing.xs,
       borderRadius: borderRadius.s,
       ...shadows.medium,
       shadowColor: colors.shadow,
@@ -151,8 +141,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       padding: 7,
       gap: 7,
       alignItems: "flex-start",
-      borderTopLeftRadius: borderRadius.s,
-      borderBottomLeftRadius: borderRadius.s,
+      borderRadius: borderRadius.s,
     },
     image: {
       width: 118,
@@ -199,10 +188,9 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       color: colors.text,
     },
     ctaButton: {
-      width: 60,
+      width: 45,
       alignItems: "center",
       justifyContent: "center",
-      borderTopRightRadius: borderRadius.s,
-      borderBottomRightRadius: borderRadius.s,
+      borderRadius: borderRadius.s,
     },
   });
