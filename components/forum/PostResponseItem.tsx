@@ -60,10 +60,15 @@ export function PostResponseItem({ post, onReply }: PostResponseItemProps) {
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={styles.username}>{author?.username ?? "..."}</Text>
-          <Text style={styles.timestamp}>{formatPostDate(post.created_at)}</Text>
+          <Text style={styles.timestamp}>
+            {formatPostDate(post.created_at)}
+          </Text>
         </View>
         <Text style={styles.body}>{post.content}</Text>
-        <Pressable onPress={() => onReply(post.id, post.author_id, author?.username)} hitSlop={8}>
+        <Pressable
+          onPress={() => onReply(post.id, post.author_id, author?.username)}
+          hitSlop={8}
+        >
           <Text style={styles.reply}>Reply</Text>
         </Pressable>
       </View>
