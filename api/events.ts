@@ -18,7 +18,10 @@ export const ZEvent = z.object({
     .nullable(),
   max_capacity: z.number().int().nullable(),
   current_attendees: z.number().int(),
-  is_registered: z.boolean().nullish().transform((v) => v ?? false),
+  is_registered: z
+    .boolean()
+    .nullish()
+    .transform((v) => v ?? false),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
 });

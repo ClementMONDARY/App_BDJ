@@ -120,10 +120,7 @@ export default function TopicDetailPage() {
   // Avatar stack logic (mirrors TopicCard)
   const messagerIds = messagersData?.users_ids ?? [];
   const allParticipantIds = Array.from(
-    new Set([
-      ...(topic?.author_id ? [topic.author_id] : []),
-      ...messagerIds,
-    ]),
+    new Set([...(topic?.author_id ? [topic.author_id] : []), ...messagerIds]),
   );
   const participantIds = allParticipantIds
     .filter((pid) => pid !== topic?.author_id)
@@ -234,11 +231,9 @@ export default function TopicDetailPage() {
 
   const handleFollow = () => {
     if (!user) {
-      Alert.alert(
-        "Connexion requise",
-        "Connectez-vous pour suivre un topic.",
-        [{ text: "OK" }],
-      );
+      Alert.alert("Connexion requise", "Connectez-vous pour suivre un topic.", [
+        { text: "OK" },
+      ]);
       return;
     }
     followMutation.mutate();
