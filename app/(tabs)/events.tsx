@@ -42,8 +42,7 @@ export default function Events() {
     isRefetching,
   } = useQuery({
     queryKey: ["events", "list", user?.id ?? null],
-    queryFn: () =>
-      EventsAPI.fetchEvents(user ? authenticatedFetch : undefined),
+    queryFn: () => EventsAPI.fetchEvents(user ? authenticatedFetch : undefined),
   });
 
   const filteredEvents = useMemo<Event[]>(() => {
@@ -56,8 +55,12 @@ export default function Events() {
     if (activeFilter === "popular") {
       result = result.filter((e) => e.start_time > now);
       result.sort((a, b) => {
-        const ratioA = a.max_capacity ? a.current_attendees / a.max_capacity : 0;
-        const ratioB = b.max_capacity ? b.current_attendees / b.max_capacity : 0;
+        const ratioA = a.max_capacity
+          ? a.current_attendees / a.max_capacity
+          : 0;
+        const ratioB = b.max_capacity
+          ? b.current_attendees / b.max_capacity
+          : 0;
         return ratioB - ratioA;
       });
     } else if (activeFilter === "soon") {
@@ -91,9 +94,7 @@ export default function Events() {
         style={{ marginBottom: 0 }}
       />
       <FilterSlider
-        options={FILTERS.filter(
-          (f) => f.value !== "registered" || !!user,
-        )}
+        options={FILTERS.filter((f) => f.value !== "registered" || !!user)}
         selectedOption={activeFilter}
         onSelect={(val) => setActiveFilter(val as FilterValue)}
       />
@@ -111,7 +112,9 @@ export default function Events() {
   if (isError) {
     return (
       <View style={styles.centered}>
-        <Text style={styles.errorText}>Impossible de charger les événements.</Text>
+        <Text style={styles.errorText}>
+          Impossible de charger les événements.
+        </Text>
       </View>
     );
   }
@@ -154,7 +157,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     },
     listContent: {
       padding: spacing.sm,
-      paddingBottom: 200,
+      paddingBottom: 150,
     },
     separator: {
       height: spacing.md,

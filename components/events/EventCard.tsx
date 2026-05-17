@@ -11,7 +11,9 @@ import {
   type ThemeColors,
 } from "@/styles";
 import { formatDate } from "@/services/dateUtils";
+import { FullscreenImageModal } from "@/components/global/FullscreenImageModal";
 import { Ionicons } from "@expo/vector-icons";
+import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 // --- Types ---
@@ -51,6 +53,7 @@ function getPlacesColor(
 export function EventCard({ event }: EventCardProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
+  const [fullscreenUri, setFullscreenUri] = useState<string | null>(null);
 
   const status = getEventStatus(event);
   const placesColor = getPlacesColor(
@@ -58,6 +61,8 @@ export function EventCard({ event }: EventCardProps) {
     event.max_capacity,
     colors.error,
   );
+
+  console.log(event.is_registered);
 
   const ctaBackgroundColor =
     status === "registered"
@@ -76,19 +81,25 @@ export function EventCard({ event }: EventCardProps) {
       {/* Main section */}
       <View style={styles.mainSection}>
         {event.cover_image ? (
-          <Image
-            source={{ uri: event.cover_image }}
-            style={styles.image}
-            resizeMode="cover"
-          />
+          <Pressable onPress={() => setFullscreenUri(event.cover_image)}>
+            <Image
+              source={{ uri: event.cover_image }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          </Pressable>
         ) : (
           <View style={[styles.image, styles.imagePlaceholder]}>
-            <Ionicons name="image-outline" size={40} color={colors.iconInactive} />
+            <Ionicons
+              name="image-outline"
+              size={40}
+              color={colors.iconInactive}
+            />
           </View>
         )}
 
         <View style={styles.content}>
-          <Text style={styles.title} numberOfLines={2}>
+          <Text style={styles.title} numberOfLines={1}>
             {event.title}
           </Text>
           <Text style={styles.description} numberOfLines={3}>
@@ -96,12 +107,10 @@ export function EventCard({ event }: EventCardProps) {
           </Text>
           <View style={styles.metaRow}>
             <View style={styles.metaItem}>
-              <Ionicons
-                name="calendar-outline"
-                size={18}
-                color={colors.text}
-              />
-              <Text style={styles.metaText}>{formatDate(event.start_time)}</Text>
+              <Ionicons name="calendar-outline" size={18} color={colors.text} />
+              <Text style={styles.metaText}>
+                {formatDate(event.start_time)}
+              </Text>
             </View>
             <View style={styles.metaItem}>
               <Ionicons name="people-outline" size={22} color={colors.text} />
@@ -119,6 +128,11 @@ export function EventCard({ event }: EventCardProps) {
       >
         <Ionicons name="arrow-forward" size={20} color="white" />
       </Pressable>
+
+      <FullscreenImageModal
+        uri={fullscreenUri}
+        onClose={() => setFullscreenUri(null)}
+      />
     </View>
   );
 }
@@ -131,8 +145,6 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       flexDirection: "row",
       gap: spacing.xs,
       borderRadius: borderRadius.s,
-      ...shadows.medium,
-      shadowColor: colors.shadow,
     },
     mainSection: {
       flex: 1,
@@ -142,6 +154,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       gap: 7,
       alignItems: "flex-start",
       borderRadius: borderRadius.s,
+      ...shadows.medium,
     },
     image: {
       width: 118,
@@ -175,7 +188,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      paddingVertical: 7,
+      paddingTop: 7,
     },
     metaItem: {
       flexDirection: "row",
@@ -192,5 +205,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
       alignItems: "center",
       justifyContent: "center",
       borderRadius: borderRadius.s,
+      shadowColor: colors.shadow,
+      ...shadows.medium,
     },
   });
