@@ -96,7 +96,6 @@ export const EventsAPI = {
   ): Promise<Registration> => {
     const response = await fetcher(`${CONFIG.API_URL}/events/${id}/register`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
     });
 
     if (!response.ok) {

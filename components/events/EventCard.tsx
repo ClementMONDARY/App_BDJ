@@ -63,8 +63,6 @@ export function EventCard({ event }: EventCardProps) {
     colors.error,
   );
 
-  console.log(event.is_registered);
-
   const ctaBackgroundColor =
     status === "registered"
       ? palette.success
