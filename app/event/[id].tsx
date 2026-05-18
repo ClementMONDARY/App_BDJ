@@ -43,8 +43,7 @@ function getPlacesColor(
 
 function isFull(event: Event): boolean {
   return (
-    event.max_capacity !== null &&
-    event.current_attendees >= event.max_capacity
+    event.max_capacity !== null && event.current_attendees >= event.max_capacity
   );
 }
 
@@ -91,13 +90,17 @@ export default function EventDetailPage() {
   });
 
   const unregisterMutation = useMutation({
-    mutationFn: () => EventsAPI.unregisterFromEvent(eventId, authenticatedFetch),
+    mutationFn: () =>
+      EventsAPI.unregisterFromEvent(eventId, authenticatedFetch),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["events", "detail", eventId],
       });
       queryClient.invalidateQueries({ queryKey: ["events", "list"] });
-      Alert.alert("Désinscription", "Vous n'êtes plus inscrit à cet événement.");
+      Alert.alert(
+        "Désinscription",
+        "Vous n'êtes plus inscrit à cet événement.",
+      );
     },
     onError: () => {
       Alert.alert("Erreur", "Impossible de se désinscrire de cet événement.");
@@ -165,8 +168,7 @@ export default function EventDetailPage() {
       ? colors.iconInactive
       : palette.primary;
 
-  const isMutating =
-    registerMutation.isPending || unregisterMutation.isPending;
+  const isMutating = registerMutation.isPending || unregisterMutation.isPending;
 
   return (
     <View style={styles.root}>
@@ -184,7 +186,11 @@ export default function EventDetailPage() {
           </Pressable>
         ) : (
           <View style={[styles.coverImage, styles.coverPlaceholder]}>
-            <Ionicons name="image-outline" size={48} color={colors.iconInactive} />
+            <Ionicons
+              name="image-outline"
+              size={48}
+              color={colors.iconInactive}
+            />
           </View>
         )}
 
@@ -223,7 +229,12 @@ export default function EventDetailPage() {
       </ScrollView>
 
       {/* Sticky CTA */}
-      <View style={[styles.ctaWrapper, { paddingBottom: spacing.md + insets.bottom }]}>
+      <View
+        style={[
+          styles.ctaWrapper,
+          { paddingBottom: spacing.md + insets.bottom },
+        ]}
+      >
         <Pressable
           style={[styles.ctaButton, { backgroundColor: ctaColor }]}
           onPress={handleCta}
