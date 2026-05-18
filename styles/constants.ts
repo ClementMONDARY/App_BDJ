@@ -64,7 +64,7 @@ export const darkColors: ThemeColors = {
   text: palette.white,
   textWhite: palette.white,
   textSecondary: "#AAAAAA",
-  border: palette.darkSurface,
+  border: palette.darkInput,
   iconActive: palette.white,
   iconInactive: palette.greyMedium,
   error: "#FF6B6B", // Lighter error for dark mode

@@ -289,7 +289,8 @@ export function MyForm() {
 
 ### Date formatting
 - **`formatDate(date: Date): string`** — Formats a Date to `DD/MM/YYYY`. Import from `@/services/dateUtils`.
-- Use it anywhere a date needs to be displayed to the user (event cards, detail pages, etc.).
+- **`formatEventDateRange(start: Date, end: Date): string`** — Formats a date range as `DD/MM/YYYY HH:MM - HH:MM` (same day) or `DD/MM/YYYY HH:MM - DD/MM/YYYY HH:MM` (different days). Import from `@/services/dateUtils`.
+- Use these anywhere dates need to be displayed to the user (event cards, detail pages, etc.).
 
 ---
 

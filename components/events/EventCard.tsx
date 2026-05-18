@@ -1,6 +1,7 @@
 import { type Event } from "@/api/events";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
+import { router } from "expo-router";
 import {
   type baseFontSize,
   borderRadius,
@@ -61,8 +62,6 @@ export function EventCard({ event }: EventCardProps) {
     event.max_capacity,
     colors.error,
   );
-
-  console.log(event.is_registered);
 
   const ctaBackgroundColor =
     status === "registered"
@@ -125,6 +124,7 @@ export function EventCard({ event }: EventCardProps) {
       {/* CTA */}
       <Pressable
         style={[styles.ctaButton, { backgroundColor: ctaBackgroundColor }]}
+        onPress={() => router.push(`/event/${event.id}`)}
       >
         <Ionicons name="arrow-forward" size={20} color="white" />
       </Pressable>
