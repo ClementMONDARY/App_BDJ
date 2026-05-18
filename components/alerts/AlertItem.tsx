@@ -9,18 +9,20 @@ import {
   spacing,
   type ThemeColors,
 } from "@/styles";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface AlertItemProps {
   notification: Notification;
   onMarkAsRead: (id: number) => void;
   onDelete: (id: number) => void;
+  onPress?: () => void;
 }
 
 export function AlertItem({
   notification,
   onMarkAsRead,
   onDelete,
+  onPress,
 }: AlertItemProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
@@ -33,6 +35,8 @@ export function AlertItem({
         return Icons.article(props, false);
       case "message":
         return Icons.message(props, false);
+      case "event":
+        return Icons.events(props, false);
       default:
         return Icons.alerts(props, false);
     }
@@ -41,7 +45,7 @@ export function AlertItem({
   return (
     <View style={styles.wrapper}>
       {!notification.is_read && <View style={styles.unreadDot} />}
-      <View style={styles.container}>
+      <Pressable style={styles.container} onPress={onPress} disabled={!onPress}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             {getIcon(notification.type, {
@@ -67,7 +71,7 @@ export function AlertItem({
           )}
         </View>
         <Text style={styles.content}>{notification.content}</Text>
-      </View>
+      </Pressable>
     </View>
   );
 }

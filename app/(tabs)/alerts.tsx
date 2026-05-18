@@ -39,6 +39,17 @@ export default function Alerts() {
     deleteNotification,
   } = useNotifications();
 
+  const getNavigationTarget = (notification: Notification) => {
+    const { type, resource_data } = notification;
+    if (type === "event" && resource_data?.event_id) {
+      return () => router.push(`/event/${resource_data.event_id}`);
+    }
+    if (type === "forum" && resource_data?.topic_id) {
+      return () => router.push(`/topic/${resource_data.topic_id}`);
+    }
+    return undefined;
+  };
+
   useEffect(() => {
     let result = notifications;
 
@@ -75,6 +86,7 @@ export default function Alerts() {
         options={[
           { label: "Récent", value: "recent" },
           { label: "Non lues", value: "unread" },
+          { label: "Évènement", value: "event" },
           { label: "Forum", value: "forum" },
           { label: "Article", value: "article" },
           { label: "Message", value: "messaging" },
@@ -140,6 +152,7 @@ export default function Alerts() {
             notification={item}
             onMarkAsRead={markAsRead}
             onDelete={deleteNotification}
+            onPress={getNavigationTarget(item)}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
