@@ -1,5 +1,5 @@
 // Palette de base fournie par l'utilisateur
-const palette = {
+export const palette = {
   white: "#FFFFFF",
   black: "#1E1E1E", // Darkest in both
   greyLight: "#F5F5F5", // Light BG
@@ -10,6 +10,7 @@ const palette = {
   darkInput: "#454545", // Slightly lighter than surface for inputs
   primary: "#257A83",
   primaryDark: "#1A555B",
+  success: "#39B300",
   error: "#CD0000",
   warning: "#E8A302",
 };
@@ -63,7 +64,7 @@ export const darkColors: ThemeColors = {
   text: palette.white,
   textWhite: palette.white,
   textSecondary: "#AAAAAA",
-  border: palette.darkSurface,
+  border: palette.darkInput,
   iconActive: palette.white,
   iconInactive: palette.greyMedium,
   error: "#FF6B6B", // Lighter error for dark mode

@@ -5,6 +5,7 @@ export {
   colors,
   fontSize,
   fonts,
+  palette,
   shadows,
   spacing,
   type ThemeColors,
