@@ -8,7 +8,10 @@ import {
   type ThemeColors,
 } from "@/styles";
 import { formatDate } from "@/services/dateUtils";
+import { FullscreenImageModal } from "@/components/global/FullscreenImageModal";
 import { Feather, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useState } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 // --- Types ---
@@ -22,20 +25,27 @@ interface ArticleCardProps {
 export function ArticleCard({ article }: ArticleCardProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
+  const [fullscreenUri, setFullscreenUri] = useState<string | null>(null);
 
   return (
     <View style={styles.card}>
       {/* Cover image */}
       <View style={styles.imageContainer}>
         {article.cover_image ? (
-          <Image
-            source={{ uri: article.cover_image }}
-            style={styles.image}
-            resizeMode="cover"
-          />
+          <Pressable onPress={() => setFullscreenUri(article.cover_image)}>
+            <Image
+              source={{ uri: article.cover_image }}
+              style={styles.image}
+              resizeMode="cover"
+            />
+          </Pressable>
         ) : (
           <View style={[styles.image, styles.imagePlaceholder]}>
-            <Ionicons name="image-outline" size={40} color={colors.iconInactive} />
+            <Ionicons
+              name="image-outline"
+              size={40}
+              color={colors.iconInactive}
+            />
           </View>
         )}
       </View>
@@ -63,11 +73,24 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </View>
           </View>
 
-          <Pressable style={styles.cta}>
+          <Pressable
+            style={styles.cta}
+            onPress={() =>
+              router.push({
+                pathname: "/article/[id]",
+                params: { id: article.id },
+              })
+            }
+          >
             <Text style={styles.ctaText}>Lire plus</Text>
           </Pressable>
         </View>
       </View>
+
+      <FullscreenImageModal
+        uri={fullscreenUri}
+        onClose={() => setFullscreenUri(null)}
+      />
     </View>
   );
 }
