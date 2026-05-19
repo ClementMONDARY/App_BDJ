@@ -41,10 +41,10 @@ export default function Articles() {
     queryFn: () => ArticlesAPI.fetchArticles(),
   });
 
-  const filteredArticles = useMemo<Article[]>(() => {
+  const filteredArticles = useMemo<(Article | null)[]>(() => {
     if (!articles) return [];
 
-    let result = [...articles];
+    let result: Article[] = [...articles];
 
     if (activeFilter === "popular") {
       result.sort(
@@ -63,7 +63,10 @@ export default function Articles() {
       );
     }
 
-    return result;
+    const padded: (Article | null)[] = [...result];
+    if (padded.length % 2 !== 0) padded.push(null);
+
+    return padded;
   }, [articles, activeFilter, searchQuery]);
 
   const renderHeader = () => (
@@ -107,8 +110,10 @@ export default function Articles() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => <ArticleCard article={item} />}
+        keyExtractor={(item, index) => item ? String(item.id) : `placeholder-${index}`}
+        renderItem={({ item }) =>
+          item ? <ArticleCard article={item} /> : <View style={styles.cardPlaceholder} />
+        }
         ListHeaderComponent={renderHeader()}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
@@ -144,6 +149,9 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     },
     row: {
       gap: spacing.sm,
+    },
+    cardPlaceholder: {
+      flex: 1,
     },
     separator: {
       height: spacing.sm,
