@@ -28,7 +28,7 @@ const signupSchema = z
     email: z.string().email("Email invalide").min(1, "L'email est requis"),
     password: z
       .string()
-      .min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+      .min(10, "Le mot de passe doit contenir au moins 10 caractères"),
     confirmPassword: z.string().min(1, "La confirmation est requise"),
   })
   .refine((data) => data.password === data.confirmPassword, {
