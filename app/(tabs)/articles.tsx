@@ -110,9 +110,15 @@ export default function Articles() {
         numColumns={2}
         columnWrapperStyle={styles.row}
         contentContainerStyle={styles.listContent}
-        keyExtractor={(item, index) => item ? String(item.id) : `placeholder-${index}`}
+        keyExtractor={(item, index) =>
+          item ? String(item.id) : `placeholder-${index}`
+        }
         renderItem={({ item }) =>
-          item ? <ArticleCard article={item} /> : <View style={styles.cardPlaceholder} />
+          item ? (
+            <ArticleCard article={item} />
+          ) : (
+            <View style={styles.cardPlaceholder} />
+          )
         }
         ListHeaderComponent={renderHeader()}
         ItemSeparatorComponent={() => <View style={styles.separator} />}

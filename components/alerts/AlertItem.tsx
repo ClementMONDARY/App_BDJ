@@ -9,7 +9,13 @@ import {
   spacing,
   type ThemeColors,
 } from "@/styles";
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 interface AlertItemProps {
   notification: Notification;

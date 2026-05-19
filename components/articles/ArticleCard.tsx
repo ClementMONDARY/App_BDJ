@@ -41,7 +41,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </Pressable>
         ) : (
           <View style={[styles.image, styles.imagePlaceholder]}>
-            <Ionicons name="image-outline" size={40} color={colors.iconInactive} />
+            <Ionicons
+              name="image-outline"
+              size={40}
+              color={colors.iconInactive}
+            />
           </View>
         )}
       </View>
@@ -69,7 +73,15 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </View>
           </View>
 
-          <Pressable style={styles.cta} onPress={() => router.push({ pathname: "/article/[id]", params: { id: article.id } })}>
+          <Pressable
+            style={styles.cta}
+            onPress={() =>
+              router.push({
+                pathname: "/article/[id]",
+                params: { id: article.id },
+              })
+            }
+          >
             <Text style={styles.ctaText}>Lire plus</Text>
           </Pressable>
         </View>
