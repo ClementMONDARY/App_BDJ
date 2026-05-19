@@ -32,7 +32,7 @@ export function AlertItem({
       case "forum":
         return Icons.forum(props, false);
       case "article":
-        return Icons.article(props, false);
+        return Icons.articles(props, false);
       case "message":
         return Icons.message(props, false);
       case "event":

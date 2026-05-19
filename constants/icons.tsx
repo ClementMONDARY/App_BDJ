@@ -21,7 +21,7 @@ export const Icons = {
       name={focused ? "chatbubbles" : "chatbubbles-outline"}
     />
   ),
-  article: (
+  articles: (
     props: Partial<React.ComponentProps<typeof Ionicons>>,
     focused: boolean,
   ) => (
