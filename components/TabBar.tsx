@@ -1,14 +1,14 @@
-import type { icon } from "@/constants/icons";
-import { TabBarSvg } from "@/constants/svg";
-import { useTheme } from "@/contexts/ThemeContext";
 import type { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import type { icon } from "@/constants/icons";
+import { TabBarSvg } from "@/constants/svg";
+import { useTheme } from "@/contexts/ThemeContext";
 import { TabBarButton } from "./TabBarButton";
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
@@ -28,6 +28,12 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   };
 
   const tabPositionX = useSharedValue(0);
+
+  useEffect(() => {
+    tabPositionX.value = withSpring(state.index * buttonWidth, {
+      duration: 500,
+    });
+  }, [state.index, buttonWidth, tabPositionX]);
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
