@@ -536,7 +536,7 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     scrollContent: {
       padding: spacing.md,
       gap: spacing.sm,
-      paddingBottom: 50
+      paddingBottom: 50,
     },
     // Topic content block
     topicContent: {
