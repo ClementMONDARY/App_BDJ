@@ -70,8 +70,9 @@ EXPO_PUBLIC_API_URL=http://<YOUR_LOCAL_IP>:3000
 The app requires a running backend API. Start your local API server (e.g. the BDJ backend) before launching the app:
 
 ```bash
-# Example — adapt to the actual backend repository
-cd ../api-bdj
+# For using the API, clone and travel to backend route
+git clone https://github.com/ClementMONDARY/App_BDJ-back.git
+cd App_BDJ-back
 # Start the database (if using Docker)
 docker compose up -d
 ```
@@ -108,6 +109,7 @@ AppBDJ/
 │   ├── suggestion-box.tsx
 │   ├── help-center.tsx
 │   └── new-topic-form.tsx
+│
 ├── api/                    # API layer — fetch calls per resource
 │   ├── events.ts
 │   ├── forum.ts
