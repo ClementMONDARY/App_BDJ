@@ -124,6 +124,17 @@ export default function Header(props: any) {
             </Link>
           )}
 
+          {/* Admin Button */}
+          {user?.role === "admin" && (
+            <Link href="/admin" style={{ padding: 4 }}>
+              <Ionicons
+                name="shield-outline"
+                size={35}
+                color={colors.iconInactive}
+              />
+            </Link>
+          )}
+
           {/* Settings Button */}
           <Link
             href="/settings"

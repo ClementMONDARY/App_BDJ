@@ -15,6 +15,9 @@ interface User {
   id: number;
   email: string;
   username?: string;
+  firstname?: string;
+  lastname?: string;
+  role?: "user" | "admin" | "moderator";
 }
 
 interface AuthContextType {
