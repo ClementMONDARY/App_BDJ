@@ -3,11 +3,12 @@ import { UnderlinedTitle } from "@/components/global/text/UnderlinedTitle";
 import { useAuth } from "@/contexts/AuthContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, spacing, type ThemeColors } from "@/styles";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 export default function AdminPage() {
   const { user } = useAuth();
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const styles = useThemeStyles(createStyles);
 
@@ -38,11 +39,13 @@ export default function AdminPage() {
               iconName="calendar-outline"
               label="Events"
               style={{ width: cardWidth }}
+              onPress={() => router.push("/admin-events")}
             />
             <AdminCard
               iconName="newspaper-outline"
               label="Articles"
               style={{ width: cardWidth }}
+              onPress={() => router.push("/admin-articles")}
             />
             <AdminCard
               iconName="chatbubble-outline"
