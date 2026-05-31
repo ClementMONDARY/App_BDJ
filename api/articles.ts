@@ -28,8 +28,11 @@ export const ArticlesAPI = {
    * GET /articles (Public)
    * List all articles.
    */
-  fetchArticles: async (): Promise<ArticleList> => {
-    const response = await fetch(`${CONFIG.API_URL}/articles`, {
+  fetchArticles: async (
+    fetcher?: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<ArticleList> => {
+    const doFetch = fetcher ?? fetch;
+    const response = await doFetch(`${CONFIG.API_URL}/articles`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });
