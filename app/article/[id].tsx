@@ -48,6 +48,7 @@ export default function ArticleDetail() {
         articleId,
         user ? authenticatedFetch : undefined,
       ),
+    staleTime: 1000 * 60 * 5,
   });
 
   const likeMutation = useMutation({
@@ -67,6 +68,10 @@ export default function ArticleDetail() {
     },
     onError: (_err, _vars, context) => {
       queryClient.setQueryData(queryKey, context?.prev);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["articles", "list"], exact: true });
+      queryClient.invalidateQueries({ queryKey: ["articles", "account"], exact: true });
     },
   });
 

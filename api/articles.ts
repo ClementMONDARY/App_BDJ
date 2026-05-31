@@ -11,7 +11,10 @@ export const ZArticle = z.object({
   cover_image: z.string().nullable(),
   view_count: z.number().int().default(0),
   like_count: z.number().int().default(0),
-  is_liked: z.boolean().optional(),
+  is_liked: z
+    .boolean()
+    .nullish()
+    .transform((v) => v ?? false),
   created_at: z.coerce.date(),
   updated_at: z.coerce.date(),
 });

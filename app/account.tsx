@@ -352,6 +352,8 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof baseFontSize) =>
     userSection: {
       flexDirection: "row",
       alignItems: "flex-start",
+      alignSelf: "center",
+      maxWidth: 300,
       gap: spacing.sm,
     },
     avatar: {
