@@ -56,8 +56,12 @@ export default function AdminEventsPage() {
     if (activeFilter === "popular") {
       result = result.filter((e) => e.start_time > now);
       result.sort((a, b) => {
-        const ratioA = a.max_capacity ? a.current_attendees / a.max_capacity : 0;
-        const ratioB = b.max_capacity ? b.current_attendees / b.max_capacity : 0;
+        const ratioA = a.max_capacity
+          ? a.current_attendees / a.max_capacity
+          : 0;
+        const ratioB = b.max_capacity
+          ? b.current_attendees / b.max_capacity
+          : 0;
         return ratioB - ratioA;
       });
     } else if (activeFilter === "soon") {
@@ -71,8 +75,7 @@ export default function AdminEventsPage() {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (e) =>
-          e.title.toLowerCase().includes(query) ||
-          String(e.id).includes(query),
+          e.title.toLowerCase().includes(query) || String(e.id).includes(query),
       );
     }
 

@@ -4,7 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { formatDate } from "@/services/dateUtils";
-import { borderRadius, fonts, type baseFontSize, spacing, type ThemeColors } from "@/styles";
+import {
+  borderRadius,
+  fonts,
+  type baseFontSize,
+  spacing,
+  type ThemeColors,
+} from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -42,11 +48,19 @@ export function EventAdminCard({ event }: EventAdminCardProps) {
 
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
-          <Ionicons name="calendar-outline" size={14} color={colors.iconInactive} />
+          <Ionicons
+            name="calendar-outline"
+            size={14}
+            color={colors.iconInactive}
+          />
           <Text style={styles.detailText}>{formatDate(event.start_time)}</Text>
         </View>
         <View style={styles.detailItem}>
-          <Ionicons name="people-outline" size={14} color={colors.iconInactive} />
+          <Ionicons
+            name="people-outline"
+            size={14}
+            color={colors.iconInactive}
+          />
           <Text style={styles.detailText}>
             {event.current_attendees}/{event.max_capacity ?? "∞"}
           </Text>
@@ -85,8 +99,7 @@ export function EventAdminCard({ event }: EventAdminCardProps) {
           Cette action est irréversible.
         </Text>
         <Text style={styles.modalText}>
-          L'événement{" "}
-          <Text style={styles.modalTextBold}>«{event.title}»</Text>{" "}
+          L'événement <Text style={styles.modalTextBold}>«{event.title}»</Text>{" "}
           sera définitivement supprimé.
         </Text>
       </Modal>

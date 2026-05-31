@@ -22,7 +22,11 @@ export function AdminCard({ iconName, label, onPress, style }: AdminCardProps) {
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.card, style, { opacity: pressed ? 0.8 : 1 }]}
+      style={({ pressed }) => [
+        styles.card,
+        style,
+        { opacity: pressed ? 0.8 : 1 },
+      ]}
       onPress={onPress}
     >
       <View style={styles.topRow}>

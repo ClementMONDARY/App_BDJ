@@ -4,7 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { formatDate } from "@/services/dateUtils";
-import { borderRadius, fonts, type baseFontSize, spacing, type ThemeColors } from "@/styles";
+import {
+  borderRadius,
+  fonts,
+  type baseFontSize,
+  spacing,
+  type ThemeColors,
+} from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -46,7 +52,11 @@ export function ArticleAdminCard({ article }: ArticleAdminCardProps) {
           <Text style={styles.detailText}>{article.view_count}</Text>
         </View>
         <View style={styles.detailItem}>
-          <Ionicons name="heart-outline" size={14} color={colors.iconInactive} />
+          <Ionicons
+            name="heart-outline"
+            size={14}
+            color={colors.iconInactive}
+          />
           <Text style={styles.detailText}>{article.like_count}</Text>
         </View>
       </View>
@@ -83,8 +93,7 @@ export function ArticleAdminCard({ article }: ArticleAdminCardProps) {
           Cette action est irréversible.
         </Text>
         <Text style={styles.modalText}>
-          L'article{" "}
-          <Text style={styles.modalTextBold}>«{article.title}»</Text>{" "}
+          L'article <Text style={styles.modalTextBold}>«{article.title}»</Text>{" "}
           sera définitivement supprimé.
         </Text>
       </Modal>

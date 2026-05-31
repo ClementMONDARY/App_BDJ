@@ -4,7 +4,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { fonts, type fontSize, spacing, type ThemeColors } from "@/styles";
 import { Stack, useRouter } from "expo-router";
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 export default function AdminPage() {
   const { user } = useAuth();
@@ -17,7 +23,10 @@ export default function AdminPage() {
   return (
     <>
       <Stack.Screen options={{ title: "Admin" }} />
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.container}
+      >
         {/* Header section */}
         <View style={styles.headerSection}>
           <View style={styles.greetingBlock}>

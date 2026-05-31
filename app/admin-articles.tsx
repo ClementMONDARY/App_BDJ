@@ -63,8 +63,7 @@ export default function AdminArticlesPage() {
       const query = searchQuery.toLowerCase();
       result = result.filter(
         (a) =>
-          a.title.toLowerCase().includes(query) ||
-          String(a.id).includes(query),
+          a.title.toLowerCase().includes(query) || String(a.id).includes(query),
       );
     }
 
