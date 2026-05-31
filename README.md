@@ -29,6 +29,12 @@ Make sure the following tools are installed on your machine before setting up th
 | Node.js | >= 18 | Use [nvm](https://github.com/nvm-sh/nvm) to manage versions |
 | pnpm | >= 9 | `npm install -g pnpm` |
 | Expo CLI | latest | Installed locally — no global install required |
+
+**At least one of these 3 options :**
+
+| Tool | Version | Notes |
+|---|---|---|
+| Physical phone + Expo Go app | latest | Used for unbundeling app on your own phone |
 | Android Studio | latest | Required for Android emulator |
 | Xcode | >= 15 | macOS only — required for iOS simulator |
 

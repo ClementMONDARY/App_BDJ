@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { fonts } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,6 +14,7 @@ export default function Header(props: any) {
   const title = options?.title ?? (route?.name ? String(route.name) : "Titre");
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
+  const router = useRouter();
   const [avatar, setAvatar] = useState<string | null>(null);
 
   useEffect(() => {
@@ -91,9 +92,7 @@ export default function Header(props: any) {
           {user ? (
             <Pressable
               style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
-              onPress={() => {
-                // Optional: Navigate to profile
-              }}
+              onPress={() => router.push("/account")}
             >
               {(() => {
                 const computedUri = getAvatarUri(avatar);
