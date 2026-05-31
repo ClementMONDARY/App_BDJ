@@ -43,7 +43,6 @@ export const ArticlesAPI = {
 
     const data = await response.json();
     return ZArticleList.parse(data);
-
   },
 
   /**

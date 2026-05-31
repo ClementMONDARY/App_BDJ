@@ -87,7 +87,12 @@ export default function AccountScreen() {
   const markedDates = registeredEvents.reduce<
     Record<
       string,
-      { selected: boolean; selectedColor: string; marked: boolean; dotColor: string }
+      {
+        selected: boolean;
+        selectedColor: string;
+        marked: boolean;
+        dotColor: string;
+      }
     >
   >((acc, event) => {
     const dateStr = event.start_time.toISOString().split("T")[0];
