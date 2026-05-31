@@ -35,7 +35,7 @@ import Carousel from "react-native-reanimated-carousel";
 
 export default function AccountScreen() {
   const { user, authenticatedFetch } = useAuth();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = useThemeStyles(createStyles);
   const { width } = useWindowDimensions();
   const [activeEventIndex, setActiveEventIndex] = useState(0);
@@ -189,6 +189,7 @@ export default function AccountScreen() {
             <Text style={styles.sectionTitle}>Agenda d'évènements</Text>
           </View>
           <Calendar
+            key={isDark ? "dark" : "light"}
             markedDates={markedDates}
             onDayPress={handleDayPress}
             theme={calendarTheme}
