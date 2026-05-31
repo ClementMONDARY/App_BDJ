@@ -83,4 +83,21 @@ export const ArticlesAPI = {
       throw new Error("Failed to toggle like");
     }
   },
+
+  /**
+   * DELETE /articles/:id (Admin/Mod)
+   * Delete an article.
+   */
+  deleteArticle: async (
+    id: number,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
+    const response = await fetcher(`${CONFIG.API_URL}/articles/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete article");
+    }
+  },
 };
