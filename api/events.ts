@@ -28,6 +28,17 @@ export const ZEvent = z.object({
 
 export const ZEventList = z.array(ZEvent);
 
+export const ZNewEvent = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  cover_image: z.string().optional(),
+  start_time: z.string().min(1),
+  end_time: z.string().min(1),
+  location: z.string().min(1),
+  price: z.number().nonnegative().optional(),
+  max_capacity: z.number().int().positive().optional(),
+});
+
 export const ZRegistration = z.object({
   id: z.number().int(),
   event_id: z.number().int(),
@@ -38,6 +49,7 @@ export const ZRegistration = z.object({
 
 export type Event = z.infer<typeof ZEvent>;
 export type EventList = z.infer<typeof ZEventList>;
+export type NewEvent = z.infer<typeof ZNewEvent>;
 export type Registration = z.infer<typeof ZRegistration>;
 
 // --- API ---
@@ -121,6 +133,51 @@ export const EventsAPI = {
     if (!response.ok) {
       throw new Error("Failed to unregister from event");
     }
+  },
+
+  /**
+   * POST /events (Admin)
+   * Create a new event.
+   */
+  createEvent: async (
+    data: NewEvent,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Event> => {
+    const response = await fetcher(`${CONFIG.API_URL}/events`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create event");
+    }
+
+    const json = await response.json();
+    return ZEvent.parse(json);
+  },
+
+  /**
+   * PUT /events/:id (Admin)
+   * Update an existing event.
+   */
+  updateEvent: async (
+    id: number,
+    data: NewEvent,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Event> => {
+    const response = await fetcher(`${CONFIG.API_URL}/events/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update event");
+    }
+
+    const json = await response.json();
+    return ZEvent.parse(json);
   },
 
   /**
