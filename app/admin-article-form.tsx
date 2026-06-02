@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -38,6 +39,7 @@ export default function AdminArticleForm() {
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const articleId = id ? Number(id) : undefined;
   const isEdit = articleId !== undefined;
@@ -164,7 +166,7 @@ export default function AdminArticleForm() {
         />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}>
         <ThemedButton
           title={isEdit ? "Enregistrer les modifications" : "Créer l'article"}
           onPress={handleSubmit(onSubmit)}

@@ -28,6 +28,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -165,6 +166,7 @@ export default function AdminEventForm() {
   const styles = useThemeStyles(createStyles);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const eventId = id ? Number(id) : undefined;
   const isEdit = eventId !== undefined;
@@ -394,7 +396,7 @@ export default function AdminEventForm() {
         />
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}>
         <ThemedButton
           title={
             isEdit ? "Enregistrer les modifications" : "Créer l'événement"
