@@ -13,6 +13,7 @@ export const palette = {
   success: "#39B300",
   error: "#CD0000",
   warning: "#E8A302",
+  info: "#2080ff"
 };
 
 // Interface pour le typage strict du thème
