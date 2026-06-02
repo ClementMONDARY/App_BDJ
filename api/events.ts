@@ -122,4 +122,21 @@ export const EventsAPI = {
       throw new Error("Failed to unregister from event");
     }
   },
+
+  /**
+   * DELETE /events/:id (Admin/Mod)
+   * Delete an event.
+   */
+  deleteEvent: async (
+    id: number,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<void> => {
+    const response = await fetcher(`${CONFIG.API_URL}/events/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to delete event");
+    }
+  },
 };
