@@ -8,7 +8,7 @@ import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { type baseFontSize, fonts, spacing, type ThemeColors } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -32,6 +32,7 @@ export default function AdminEventsPage() {
   const { authenticatedFetch } = useAuth();
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterValue>("all");
@@ -133,7 +134,11 @@ export default function AdminEventsPage() {
               </View>
             }
           />
-          <TouchableOpacity style={styles.floatingButton} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.floatingButton}
+            activeOpacity={0.8}
+            onPress={() => router.push("/admin-event-form")}
+          >
             <View style={styles.floatingButtonInner}>
               <Ionicons name="add-circle-outline" size={45} color="white" />
             </View>
