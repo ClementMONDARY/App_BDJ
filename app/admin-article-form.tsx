@@ -47,12 +47,7 @@ export default function AdminArticleForm() {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [pendingData, setPendingData] = useState<FormData | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    watch,
-    reset,
-  } = useForm<FormData>({
+  const { control, handleSubmit, watch, reset } = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", content: "", cover_image: "" },
   });
@@ -95,13 +90,17 @@ export default function AdminArticleForm() {
     },
     onError: () => {
       setConfirmVisible(false);
-      Alert.alert("Erreur", "Impossible de sauvegarder l'article. Veuillez réessayer.");
+      Alert.alert(
+        "Erreur",
+        "Impossible de sauvegarder l'article. Veuillez réessayer.",
+      );
     },
   });
 
   const titleValue = watch("title", "");
   const contentValue = watch("content", "");
-  const isFormReady = titleValue.trim().length > 0 && contentValue.trim().length > 0;
+  const isFormReady =
+    titleValue.trim().length > 0 && contentValue.trim().length > 0;
 
   const onSubmit = (data: FormData) => {
     setPendingData(data);
@@ -166,7 +165,9 @@ export default function AdminArticleForm() {
         />
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}>
+      <View
+        style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}
+      >
         <ThemedButton
           title={isEdit ? "Enregistrer les modifications" : "Créer l'article"}
           onPress={handleSubmit(onSubmit)}

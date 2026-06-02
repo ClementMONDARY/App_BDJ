@@ -69,7 +69,10 @@ export function ArticleAdminCard({ article }: ArticleAdminCardProps) {
           style={styles.actionBtn}
           activeOpacity={0.7}
           onPress={() =>
-            router.push({ pathname: "/article/[id]", params: { id: article.id } })
+            router.push({
+              pathname: "/article/[id]",
+              params: { id: article.id },
+            })
           }
         >
           <Ionicons name="eye-outline" size={20} color={palette.info} />

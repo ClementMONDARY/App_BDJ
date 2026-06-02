@@ -7,7 +7,13 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useThemeStyles } from "@/hooks/useThemeStyles";
 import { formatEventDateRange } from "@/services/dateUtils";
-import { type baseFontSize, borderRadius, fonts, spacing, type ThemeColors } from "@/styles";
+import {
+  type baseFontSize,
+  borderRadius,
+  fonts,
+  spacing,
+  type ThemeColors,
+} from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import DateTimePicker, {
@@ -115,7 +121,11 @@ function DateTimeField({ label, value, onChange }: DateTimeFieldProps) {
         }}
         activeOpacity={0.7}
       >
-        <Ionicons name="calendar-outline" size={18} color={colors.iconInactive} />
+        <Ionicons
+          name="calendar-outline"
+          size={18}
+          color={colors.iconInactive}
+        />
         <Text style={styles.dateText}>{formatDateTime(value)}</Text>
         <Ionicons name="chevron-down" size={16} color={colors.iconInactive} />
       </TouchableOpacity>
@@ -273,7 +283,9 @@ export default function AdminEventForm() {
   return (
     <View style={styles.root}>
       <Stack.Screen
-        options={{ title: isEdit ? "Modifier l'événement" : "Nouvel événement" }}
+        options={{
+          title: isEdit ? "Modifier l'événement" : "Nouvel événement",
+        }}
       />
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
@@ -396,11 +408,11 @@ export default function AdminEventForm() {
         />
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}>
+      <View
+        style={[styles.footer, { paddingBottom: spacing.md + insets.bottom }]}
+      >
         <ThemedButton
-          title={
-            isEdit ? "Enregistrer les modifications" : "Créer l'événement"
-          }
+          title={isEdit ? "Enregistrer les modifications" : "Créer l'événement"}
           onPress={handleSubmit(onSubmit)}
           disabled={!isFormReady}
         />
