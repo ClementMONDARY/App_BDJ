@@ -18,8 +18,15 @@ export const ZArticle = z.object({
 
 export const ZArticleList = z.array(ZArticle);
 
+export const ZNewArticle = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  cover_image: z.string().optional(),
+});
+
 export type Article = z.infer<typeof ZArticle>;
 export type ArticleList = z.infer<typeof ZArticleList>;
+export type NewArticle = z.infer<typeof ZNewArticle>;
 
 // --- API ---
 
@@ -82,6 +89,51 @@ export const ArticlesAPI = {
     if (!response.ok) {
       throw new Error("Failed to toggle like");
     }
+  },
+
+  /**
+   * POST /articles (Admin/Mod)
+   * Create a new article.
+   */
+  createArticle: async (
+    data: NewArticle,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Article> => {
+    const response = await fetcher(`${CONFIG.API_URL}/articles`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create article");
+    }
+
+    const json = await response.json();
+    return ZArticle.parse(json);
+  },
+
+  /**
+   * PUT /articles/:id (Author)
+   * Update an existing article.
+   */
+  updateArticle: async (
+    id: number,
+    data: NewArticle,
+    fetcher: (url: string, init?: RequestInit) => Promise<Response>,
+  ): Promise<Article> => {
+    const response = await fetcher(`${CONFIG.API_URL}/articles/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update article");
+    }
+
+    const json = await response.json();
+    return ZArticle.parse(json);
   },
 
   /**

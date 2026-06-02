@@ -10,9 +10,11 @@ import {
   type baseFontSize,
   spacing,
   type ThemeColors,
+  palette,
 } from "@/styles";
 import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -25,6 +27,7 @@ export function ArticleAdminCard({ article }: ArticleAdminCardProps) {
   const { colors } = useTheme();
   const styles = useThemeStyles(createStyles);
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const deleteMutation = useMutation({
@@ -62,7 +65,28 @@ export function ArticleAdminCard({ article }: ArticleAdminCardProps) {
       </View>
 
       <View style={styles.actionsRow}>
-        <TouchableOpacity style={styles.actionBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          activeOpacity={0.7}
+          onPress={() =>
+            router.push({
+              pathname: "/article/[id]",
+              params: { id: article.id },
+            })
+          }
+        >
+          <Ionicons name="eye-outline" size={20} color={palette.info} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          activeOpacity={0.7}
+          onPress={() =>
+            router.push({
+              pathname: "/admin-article-form",
+              params: { id: article.id },
+            })
+          }
+        >
           <Ionicons name="pencil-outline" size={20} color="#E8A302" />
         </TouchableOpacity>
         <TouchableOpacity

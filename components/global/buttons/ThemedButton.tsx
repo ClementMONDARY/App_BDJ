@@ -30,8 +30,9 @@ export function ThemedButton({
     <Pressable
       style={({ pressed }) => [
         styles.button,
+        disabled && styles.buttonDisabled,
         style,
-        { opacity: pressed || disabled || loading ? 0.7 : 1 },
+        (pressed || loading) && !disabled && { opacity: 0.7 },
       ]}
       disabled={disabled || loading}
       {...props}
@@ -55,6 +56,9 @@ const createStyles = (colors: ThemeColors, fontSizes: typeof fontSize) =>
       justifyContent: "center",
       alignItems: "center",
       ...shadows.light,
+    },
+    buttonDisabled: {
+      backgroundColor: colors.iconInactive,
     },
     text: {
       color: colors.white,
