@@ -56,11 +56,6 @@ export default function AdminPage() {
               style={{ width: cardWidth }}
               onPress={() => router.push("/admin-articles")}
             />
-            <AdminCard
-              iconName="chatbubble-outline"
-              label="Suggestions"
-              style={{ width: cardWidth }}
-            />
           </View>
         </View>
       </ScrollView>
