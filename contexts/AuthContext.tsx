@@ -1,4 +1,4 @@
-import { CONFIG } from "@/constants/Config";
+import { AuthAPI, type User } from "@/api/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import type React from "react";
@@ -10,15 +10,6 @@ import {
   useState,
 } from "react";
 import { Platform } from "react-native";
-
-interface User {
-  id: number;
-  email: string;
-  username?: string;
-  firstname?: string;
-  lastname?: string;
-  role?: "user" | "admin" | "moderator";
-}
 
 interface AuthContextType {
   user: User | null;
@@ -91,11 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = useCallback(async () => {
     try {
       const refreshToken = await getRefreshToken();
-      await fetch(`${CONFIG.API_URL}/auth/logout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refreshToken }),
-      });
+      await AuthAPI.logout(refreshToken);
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -109,22 +96,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const refreshToken = await getRefreshToken();
       if (!refreshToken) return null;
 
-      const response = await fetch(`${CONFIG.API_URL}/auth/refresh`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ refreshToken }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        await saveTokens(data.accessToken, data.refreshToken);
-        return data.accessToken;
-      } else {
-        await signOut();
-        return null;
-      }
+      const data = await AuthAPI.refresh(refreshToken);
+      await saveTokens(data.accessToken, data.refreshToken);
+      return data.accessToken;
     } catch (error) {
       console.error("Token refresh error:", error);
       await signOut();
@@ -166,17 +140,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      const response = await authenticatedFetch(`${CONFIG.API_URL}/auth/me`);
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData);
-      } else {
-        setUser(null);
-        if (response.status === 401) {
-          await clearTokens();
-        }
-      }
+      const userData = await AuthAPI.getMe(authenticatedFetch);
+      setUser(userData);
     } catch (error) {
       console.error("Check user error:", error);
       setUser(null);
@@ -192,22 +157,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = useCallback(
     async (email: string, password: string) => {
       try {
-        const response = await fetch(`${CONFIG.API_URL}/auth/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Login failed");
-        }
-
-        const data = await response.json();
+        const data = await AuthAPI.login(email, password);
         await saveTokens(data.accessToken, data.refreshToken);
-
         await checkUser();
       } catch (error) {
         console.error("Login error:", error);
@@ -226,28 +177,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       lastname: string,
     ) => {
       try {
-        const response = await fetch(`${CONFIG.API_URL}/auth/signup`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            username,
-            firstname,
-            lastname,
-          }),
+        const tokens = await AuthAPI.signup({
+          email,
+          password,
+          username,
+          firstname,
+          lastname,
         });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Signup failed");
-        }
-
-        const data = await response.json();
-        if (data.accessToken && data.refreshToken) {
-          await saveTokens(data.accessToken, data.refreshToken);
+        if (tokens) {
+          await saveTokens(tokens.accessToken, tokens.refreshToken);
           await checkUser();
         }
       } catch (error) {
